@@ -1,0 +1,89 @@
+{
+  "role": [
+    {"_id": 1, "name": "站长"},
+    {"_id": 2, "name": "副站长"},
+    {"_id": 3, "name": "超级管理员"},
+    {"_id": 4, "name": "社区管理员"},
+    {"_id": 5, "name": "资源管理员"},
+    {"_id": 6, "name": "文章管理员"},
+    {"_id": 7, "name": "晨读管理员"},
+    {"_id": 8, "name": "高级会员"},
+    {"_id": 9, "name": "中级会员"},
+    {"_id": 10, "name": "初级会员"}
+  ],
+  "authority": [
+    {"_id": 1, "name": "用户管理", "menu1": 0, "menu2": 0, "route": ""},
+    {"_id": 2, "name": "权限管理", "menu1": 1, "menu2": 0, "route": "/admin/user/auth/list"},
+    {"_id": 3, "name": "权限查询", "menu1": 1, "menu2": 2, "route": "/admin/user/auth/query.html"},
+    {"_id": 4, "name": "新建权限", "menu1": 1, "menu2": 2, "route": "/admin/user/auth/new"},
+    {"_id": 5, "name": "修改权限", "menu1": 1, "menu2": 2, "route": "/admin/user/auth/modify"},
+    {"_id": 6, "name": "删除权限", "menu1": 1, "menu2": 2, "route": "/admin/user/auth/del"},
+    {"_id": 7, "name": "角色管理", "menu1": 1, "menu2": 0, "route": "/admin/user/role/list"},
+    {"_id": 8, "name": "角色查询", "menu1": 1, "menu2": 7, "route": "/admin/user/role/query.html"},
+    {"_id": 9, "name": "新建角色", "menu1": 1, "menu2": 7, "route": "/admin/user/role/new"},
+    {"_id": 10, "name": "修改角色", "menu1": 1, "menu2": 7, "route": "/admin/user/role/modify"},
+    {"_id": 11, "name": "删除角色", "menu1": 1, "menu2": 7, "route": "/admin/user/role/del"},
+    {"_id": 12, "name": "用户管理", "menu1": 1, "menu2": 0, "route": "/admin/user/user/list"},
+    {"_id": 13, "name": "用户查询", "menu1": 1, "menu2": 12, "route": "/admin/user/user/query.html"},
+    {"_id": 14, "name": "用户详情", "menu1": 1, "menu2": 12, "route": "/admin/user/user/detail"},
+    {"_id": 15, "name": "社区管理", "menu1": 0, "menu2": 0, "route": ""},
+    {"_id": 16, "name": "帖子管理", "menu1": 15, "menu2": 0, "route": "/admin/community/topic/list"},
+    {"_id": 17, "name": "帖子查询", "menu1": 15, "menu2": 16, "route": "/admin/community/topic/query.html"},
+    {"_id": 18, "name": "帖子修改", "menu1": 15, "menu2": 16, "route": "/admin/community/topic/modify"},
+    {"_id": 19, "name": "抓取管理", "menu1": 0, "menu2": 0, "route": ""},
+    {"_id": 20, "name": "文章管理", "menu1": 19, "menu2": 0, "route": "/admin/crawl/article/list"},
+    {"_id": 21, "name": "规则管理", "menu1": 19, "menu2": 0, "route": "/admin/crawl/rule/list"},
+    {"_id": 22, "name": "文章修改", "menu1": 19, "menu2": 20, "route": "/admin/crawl/article/modify"},
+    {"_id": 23, "name": "文章删除", "menu1": 19, "menu2": 20, "route": "/admin/crawl/article/del"},
+    {"_id": 24, "name": "新建规则", "menu1": 19, "menu2": 21, "route": "/admin/crawl/rule/new"},
+    {"_id": 25, "name": "抓取文章", "menu1": 19, "menu2": 20, "route": "/admin/crawl/article/new"},
+    {"_id": 26, "name": "文章查询", "menu1": 19, "menu2": 20, "route": "/admin/crawl/article/query.html"},
+    {"_id": 27, "name": "修改规则", "menu1": 19, "menu2": 21, "route": "/admin/crawl/rule/modify"},
+    {"_id": 28, "name": "晨读管理", "menu1": 0, "menu2": 0, "route": ""},
+    {"_id": 29, "name": "晨读列表", "menu1": 28, "menu2": 0, "route": "/admin/reading/list"},
+    {"_id": 30, "name": "晨读查询", "menu1": 28, "menu2": 29, "route": "/admin/reading/query.html"},
+    {"_id": 31, "name": "发布晨读", "menu1": 28, "menu2": 29, "route": "/admin/reading/publish"},
+    {"_id": 32, "name": "管理工具", "menu1": 0, "menu2": 0, "route": ""},
+    {"_id": 33, "name": "生成Sitemap", "menu1": 32, "menu2": 0, "route": "/admin/tool/sitemap"},
+    {"_id": 34, "name": "项目管理", "menu1": 15, "menu2": 0, "route": "/admin/community/project/list"},
+    {"_id": 35, "name": "项目查询", "menu1": 15, "menu2": 34, "route": "/admin/community/project/query.html"},
+    {"_id": 36, "name": "项目上下线", "menu1": 15, "menu2": 34, "route": "/admin/community/project/update_status"},
+    {"_id": 37, "name": "规则查询", "menu1": 19, "menu2": 21, "route": "/admin/crawl/rule/query.html"},
+    {"_id": 38, "name": "用户修改", "menu1": 1, "menu2": 12, "route": "/admin/user/user/modify"},
+    {"_id": 39, "name": "设置", "menu1": 0, "menu2": 0, "route": ""},
+    {"_id": 40, "name": "常规", "menu1": 39, "menu2": 0, "route": "/admin/setting/genneral/modify"},
+    {"_id": 41, "name": "导航", "menu1": 39, "menu2": 0, "route": "/admin/setting/nav/modify"},
+    {"_id": 42, "name": "节点管理", "menu1": 15, "menu2": 0, "route": "/admin/community/node/list"},
+    {"_id": 43, "name": "编辑/新增节点", "menu1": 15, "menu2": 42, "route": "/admin/community/node/modify"}
+  ],
+  "website_setting": [
+    {
+      "_id": 1,
+      "name": "Go语言中文网",
+      "domain": "studygolang.com",
+      "title_suffix": "- Go语言中文网 - Golang中文社区",
+      "favicon": "/static/img/favicon.ico",
+      "logo": "/static/img/logo.png",
+      "start_year": 2013,
+      "blog_url": "http://blog.studygolang.com",
+      "slogan": "Go语言中文网，中国 Golang 社区，致力于构建完善的 Golang 中文社区，Go语言爱好者的学习家园。",
+      "beian": "京ICP备14030343号-1",
+      "footer_nav": "[{\"name\":\"关于\",\"url\":\"/wiki/about\"},{\"name\":\"贡献者\",\"url\":\"/wiki/contributors\"},{\"name\":\"反馈\",\"url\":\"/topics/node/16\"},{\"name\":\"Github\",\"url\":\"https://github.com/studygolang\",\"outer_site\":true}]",
+      "project_df_logo": "",
+      "index_nav": "[{\"tab\":\"all\",\"name\":\"全部\",\"data_source\":\"feed\"}]"
+    }
+  ],
+  "friend_link": [
+    {"_id": 1, "name": "Go语言中文网", "url": "http://studygolang.com", "seq": 0, "logo": ""}
+  ],
+  "user_setting": [
+    {"_id": 1, "key": "new_user_wait", "value": 0, "remark": "新用户注册多久才能发布帖子，单位秒，0表示没限制"},
+    {"_id": 2, "key": "can_edit_time", "value": 172800, "remark": "发布后多久内能够编辑，单位秒"},
+    {"_id": 3, "key": "publish_times", "value": 3, "remark": "一天发布次数大于该值，需要验证码"},
+    {"_id": 4, "key": "publish_interval", "value": 60, "remark": "发布时间间隔在该值内，需要验证码，单位秒"}
+  ],
+  "mission": [
+    {"_id": 1, "name": "初始资本", "type": 2, "fixed": 2000, "min": 0, "max": 0, "incr": 0, "state": 0},
+    {"_id": 2, "name": "每日登录任务", "type": 1, "fixed": 0, "min": 25, "max": 50, "incr": 5, "state": 0}
+  ]
+}

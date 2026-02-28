@@ -1,0 +1,88 @@
+version: '3.8'
+services:
+  studygolang:
+    container_name: studygolang
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8088:8088"
+    networks:
+      - app_net
+    depends_on:
+      mongodb:
+        condition: service_started
+      redis:
+        condition: service_started
+    volumes:
+      - ./config:/data/www/studygolang/config
+      - ./log:/data/www/studygolang/log
+      - ./data:/data/www/studygolang/data
+    restart: always
+
+  nginx:
+    container_name: nginx
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - studygolang
+    networks:
+      - app_net
+    restart: always
+
+  mongodb:
+    container_name: mongodb
+    image: "mongo:6.0"
+    networks:
+      - app_net
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: always
+    command: mongod --replSet rs0
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # One-time init container to set up MongoDB replica set (needed for transactions)
+  mongo-init:
+    container_name: mongo-init
+    image: "mongo:6.0"
+    networks:
+      - app_net
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    entrypoint: >
+      mongosh --host mongodb --eval '
+        try { rs.initiate({ _id: "rs0", members: [{ _id: 0, host: "mongodb:27017" }] }) }
+        catch(e) { print("Already initialized or error:", e) }
+      '
+    restart: "no"
+
+  redis:
+    container_name: redis
+    image: "redis:7-alpine"
+    networks:
+      - app_net
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+
+volumes:
+  mongodb_data:
+  redis_data:
+
+networks:
+  app_net:
+    driver: bridge
