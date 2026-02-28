@@ -23,8 +23,9 @@ func (CommentController) CommentList(ctx echo.Context) error {
 	paginator := logic.NewPaginatorWithPerPage(curPage, perPage)
 	comments := logic.DefaultComment.FindAll(context.EchoContext(ctx), paginator, "", "objid=? AND objtype=?", objid, objtype)
 	total := logic.DefaultComment.Count(context.EchoContext(ctx), "objid=? AND objtype=?", objid, objtype)
+	enriched := logic.DefaultComment.EnrichWithUsers(context.EchoContext(ctx), comments)
 	return success(ctx, map[string]interface{}{
-		"list":     comments,
+		"list":     enriched,
 		"total":    total,
 		"page":     curPage,
 		"per_page": perPage,

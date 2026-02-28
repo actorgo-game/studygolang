@@ -66,9 +66,9 @@ func (this *Topic) BeforeInsert() {
 // 社区主题扩展（计数）信息
 type TopicEx struct {
 	Tid   int       `json:"-" bson:"tid"`
-	View  int       `json:"view" bson:"view"`
-	Reply int       `json:"reply" bson:"reply"`
-	Like  int       `json:"like" bson:"like"`
+	View  int       `json:"viewnum" bson:"view"`
+	Reply int       `json:"cmtnum" bson:"reply"`
+	Like  int       `json:"likenum" bson:"like"`
 	Mtime time.Time `json:"mtime" bson:"mtime"`
 }
 
@@ -79,9 +79,9 @@ func (*TopicEx) CollectionName() string {
 // 社区主题扩展（计数）信息，用于 incr 更新
 type TopicUpEx struct {
 	Tid   int       `json:"-" bson:"_id"`
-	View  int       `json:"view" bson:"view"`
-	Reply int       `json:"reply" bson:"reply"`
-	Like  int       `json:"like" bson:"like"`
+	View  int       `json:"viewnum" bson:"view"`
+	Reply int       `json:"cmtnum" bson:"reply"`
+	Like  int       `json:"likenum" bson:"like"`
 	Mtime time.Time `json:"mtime" bson:"mtime"`
 }
 

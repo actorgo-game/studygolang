@@ -151,16 +151,20 @@ export interface Project {
 export interface Book {
   id: number
   name: string
-  ebook_url: string
+  ename: string
   cover: string
   author: string
   translator: string
   lang: number
   pub_date: string
-  intro: string
-  price: number
-  buy_url: string
+  desc: string
   tags: string
+  catalogue: string
+  is_free: boolean
+  online_url: string
+  download_url: string
+  buy_url: string
+  price: number
   viewnum: number
   cmtnum: number
   likenum: number
@@ -186,13 +190,13 @@ export interface Reading {
   id: number
   rtype: number
   content: string
+  inner: number
   url: string
+  moreurls: string
   username: string
-  clicktimes: number
-  cmtnum: number
-  likenum: number
+  clicknum: number
   ctime: string
-  user: User
+  urls: string[]
 }
 
 export interface Comment {

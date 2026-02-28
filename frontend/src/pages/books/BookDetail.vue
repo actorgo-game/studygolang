@@ -44,12 +44,12 @@ async function handleLike() {
             <NText v-if="book.price">价格：¥{{ book.price }}</NText>
             <NSpace :size="8" style="margin-top: 8px">
               <a v-if="book.buy_url" :href="book.buy_url" target="_blank" rel="noopener"><NButton type="primary" size="small"><template #icon><NIcon :component="CartOutline" /></template>购买</NButton></a>
-              <a v-if="book.ebook_url" :href="book.ebook_url" target="_blank" rel="noopener"><NButton size="small">在线阅读</NButton></a>
+              <a v-if="book.online_url" :href="book.online_url" target="_blank" rel="noopener"><NButton size="small">在线阅读</NButton></a>
             </NSpace>
           </NSpace>
         </div>
       </div>
-      <div class="markdown-body" v-html="renderMarkdown(book.intro)" />
+      <div class="markdown-body" v-html="renderMarkdown(book.desc)" />
       <NSpace style="margin-top: 24px" :size="12">
         <NButton @click="handleLike" quaternary><template #icon><NIcon :component="HeartOutline" /></template>{{ book.likenum }} 推荐</NButton>
       </NSpace>

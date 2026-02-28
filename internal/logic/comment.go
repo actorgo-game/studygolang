@@ -501,6 +501,25 @@ func (self CommentLogic) FindAll(ctx context.Context, paginator *Paginator, orde
 	return self.filterDelObjectCmt(comments)
 }
 
+// EnrichWithUsers 为评论列表填充用户信息
+func (CommentLogic) EnrichWithUsers(ctx context.Context, comments []*model.Comment) []map[string]interface{} {
+	if len(comments) == 0 {
+		return nil
+	}
+	uids := make([]int, 0, len(comments))
+	for _, c := range comments {
+		uids = append(uids, c.Uid)
+	}
+	userMap := DefaultUser.FindUserInfos(ctx, uids)
+	result := make([]map[string]interface{}, len(comments))
+	for i, c := range comments {
+		m := structs.Map(c)
+		m["user"] = userMap[c.Uid]
+		result[i] = m
+	}
+	return result
+}
+
 // Count 获取用户全部评论数
 func (CommentLogic) Count(ctx context.Context, querystring string, args ...interface{}) int64 {
 	objLog := GetLogger(ctx)
