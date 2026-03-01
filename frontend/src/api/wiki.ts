@@ -16,3 +16,7 @@ export function createWiki(data: Record<string, any>) {
 export function modifyWiki(data: Record<string, any>) {
   return postForm('/wiki/modify', data)
 }
+
+export function deleteWiki(id: number) {
+  return postForm('/wiki/delete', { id })
+}

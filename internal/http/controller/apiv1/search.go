@@ -135,6 +135,32 @@ func mongoSearch(ctx stdctx.Context, q string, page, limit int) []map[string]int
 		}
 	}
 
+	projectFilter := bson.M{"$or": []bson.M{{"name": bson.M{"$regex": escaped}}, {"category": bson.M{"$regex": escaped}}}}
+	cursor4, err := db.GetCollection("open_project").Find(ctx, projectFilter, options.Find().SetSort(bson.M{"_id": -1}).SetSkip(skip).SetLimit(each).SetProjection(bson.M{"_id": 1, "name": 1, "category": 1, "uri": 1, "desc": 1}))
+	if err == nil {
+		defer cursor4.Close(ctx)
+		var projects []struct {
+			Id       int    `bson:"_id"`
+			Name     string `bson:"name"`
+			Category string `bson:"category"`
+			Uri      string `bson:"uri"`
+			Desc     string `bson:"desc"`
+		}
+		if cursor4.All(ctx, &projects) == nil {
+			for _, p := range projects {
+				uri := p.Uri
+				if uri == "" {
+					uri = fmt.Sprintf("%d", p.Id)
+				}
+				results = append(results, map[string]interface{}{
+					"title":   p.Category + p.Name,
+					"content": truncate(p.Desc, 200),
+					"url":     fmt.Sprintf("/p/%s", uri),
+				})
+			}
+		}
+	}
+
 	return results
 }
 

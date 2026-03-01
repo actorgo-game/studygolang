@@ -22,13 +22,16 @@ func (self SidebarController) RegisterRoute(g *echo.Group) {
 }
 
 func (SidebarController) SiteStat(ctx echo.Context) error {
+	commentTotal := logic.DefaultComment.Count(context.EchoContext(ctx), "")
 	return success(ctx, map[string]interface{}{
-		"user":    logic.DefaultUser.Total(),
-		"topic":   logic.DefaultTopic.Total(),
-		"article": logic.DefaultArticle.Total(),
+		"user":     logic.DefaultUser.Total(),
+		"topic":    logic.DefaultTopic.Total(),
+		"article":  logic.DefaultArticle.Total(),
+		"comment":  commentTotal,
 		"resource": logic.DefaultResource.Total(),
-		"project": logic.DefaultProject.Total(),
-		"book":    logic.DefaultGoBook.Total(),
+		"project":  logic.DefaultProject.Total(),
+		"book":     logic.DefaultGoBook.Total(),
+		"wiki":     logic.DefaultWiki.Total(),
 	})
 }
 

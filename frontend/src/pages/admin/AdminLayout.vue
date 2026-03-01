@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, h } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { NLayout, NLayoutSider, NLayoutContent, NMenu, NIcon, NText, NSpace } from 'naive-ui'
-import { PeopleOutline, ChatbubblesOutline, LibraryOutline, GitNetworkOutline, ReaderOutline, SettingsOutline, HomeOutline, NewspaperOutline } from '@vicons/ionicons5'
-import { h } from 'vue'
+import { NLayout, NLayoutSider, NLayoutContent, NMenu, NIcon, NText, NSpace, NButton } from 'naive-ui'
+import { PeopleOutline, ChatbubblesOutline, LibraryOutline, GitNetworkOutline, ReaderOutline, SettingsOutline, HomeOutline, NewspaperOutline, GlobeOutline, BookOutline, DocumentTextOutline, FolderOpenOutline } from '@vicons/ionicons5'
 
 const route = useRoute()
 const router = useRouter()
@@ -17,8 +16,10 @@ const menuOptions = [
   { label: '用户管理', key: '/admin/user/user/list', icon: renderIcon(PeopleOutline) },
   { label: '主题管理', key: '/admin/community/topic/list', icon: renderIcon(ChatbubblesOutline) },
   { label: '文章管理', key: '/admin/crawl/article/list', icon: renderIcon(NewspaperOutline) },
+  { label: '资源管理', key: '/admin/resource/list', icon: renderIcon(FolderOpenOutline) },
+  { label: '图书管理', key: '/admin/book/list', icon: renderIcon(BookOutline) },
+  { label: 'Wiki管理', key: '/admin/wiki/list', icon: renderIcon(DocumentTextOutline) },
   { label: '节点管理', key: '/admin/community/node/list', icon: renderIcon(GitNetworkOutline) },
-  { label: '爬取规则', key: '/admin/crawl/rule/list', icon: renderIcon(LibraryOutline) },
   { label: '晨读管理', key: '/admin/reading/list', icon: renderIcon(ReaderOutline) },
   { label: '系统设置', key: '/admin/setting', icon: renderIcon(SettingsOutline) },
 ]
@@ -56,6 +57,12 @@ function onMenuSelect(key: string) {
         :collapsed-width="64"
         :collapsed-icon-size="22"
       />
+      <div style="padding: 12px; text-align: center; margin-top: auto">
+        <NButton quaternary size="small" tag="a" href="/" target="_blank" style="width: 100%">
+          <template #icon><NIcon :component="GlobeOutline" /></template>
+          {{ collapsed ? '' : '访问网站' }}
+        </NButton>
+      </div>
     </NLayoutSider>
     <NLayout>
       <NLayoutContent style="padding: 24px; background: #f5f5f5">

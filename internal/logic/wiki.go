@@ -239,3 +239,22 @@ func (WikiLogic) findByIds(ids []int) map[int]*model.Wiki {
 	}
 	return wikis
 }
+
+func (WikiLogic) Delete(ctx context.Context, id, uid int, isRoot bool) error {
+	wiki := &model.Wiki{}
+	err := db.GetCollection("wiki").FindOne(ctx, bson.M{"_id": id}).Decode(wiki)
+	if err != nil {
+		return errors.New("Wiki不存在")
+	}
+	if wiki.Uid != uid && !isRoot {
+		return errors.New("无权删除")
+	}
+	_, err = db.GetCollection("wiki").DeleteOne(ctx, bson.M{"_id": id})
+	return err
+}
+
+func (WikiLogic) Total() int64 {
+	ctx := context.Background()
+	total, _ := db.GetCollection("wiki").CountDocuments(ctx, bson.M{})
+	return total
+}

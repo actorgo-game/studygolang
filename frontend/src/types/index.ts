@@ -230,6 +230,7 @@ export interface SiteStat {
   project: number
   book: number
   comment: number
+  wiki: number
 }
 
 export interface FriendLink {

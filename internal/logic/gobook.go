@@ -8,6 +8,7 @@ package logic
 
 import (
 	"context"
+	"errors"
 	"net/url"
 	"time"
 
@@ -201,6 +202,16 @@ func (GoBookLogic) FindById(ctx context.Context, id interface{}) (*model.Book, e
 	}
 
 	return book, err
+}
+
+func (GoBookLogic) Delete(ctx context.Context, id int) error {
+	book := &model.Book{}
+	err := db.GetCollection("book").FindOne(ctx, bson.M{"_id": id}).Decode(book)
+	if err != nil {
+		return errors.New("图书不存在")
+	}
+	_, err = db.GetCollection("book").DeleteOne(ctx, bson.M{"_id": id})
+	return err
 }
 
 // Total 图书总数

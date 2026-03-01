@@ -32,8 +32,9 @@ const routes: RouteRecordRaw[] = [
       { path: 'book/:id', name: 'BookDetail', component: () => import('@/pages/books/BookDetail.vue') },
       // Wiki
       { path: 'wiki', name: 'Wiki', component: () => import('@/pages/wiki/WikiList.vue') },
-      { path: 'wiki/:uri', name: 'WikiDetail', component: () => import('@/pages/wiki/WikiDetail.vue') },
       { path: 'wiki/new', name: 'WikiNew', component: () => import('@/pages/wiki/WikiEdit.vue'), meta: { requireAuth: true } },
+      { path: 'wiki/edit/:id', name: 'WikiEdit', component: () => import('@/pages/wiki/WikiEdit.vue'), meta: { requireAuth: true } },
+      { path: 'wiki/:uri', name: 'WikiDetail', component: () => import('@/pages/wiki/WikiDetail.vue') },
       // Readings
       { path: 'readings', name: 'Readings', component: () => import('@/pages/readings/ReadingList.vue') },
       { path: 'readings/:id', name: 'ReadingDetail', component: () => import('@/pages/readings/ReadingDetail.vue') },
@@ -70,8 +71,10 @@ const routes: RouteRecordRaw[] = [
       { path: 'user/user/list', name: 'AdminUsers', component: () => import('@/pages/admin/UserManage.vue') },
       { path: 'community/topic/list', name: 'AdminTopics', component: () => import('@/pages/admin/TopicManage.vue') },
       { path: 'crawl/article/list', name: 'AdminArticles', component: () => import('@/pages/admin/ArticleManage.vue') },
+      { path: 'resource/list', name: 'AdminResources', component: () => import('@/pages/admin/ResourceManage.vue') },
+      { path: 'book/list', name: 'AdminBooks', component: () => import('@/pages/admin/BookManage.vue') },
+      { path: 'wiki/list', name: 'AdminWikis', component: () => import('@/pages/admin/WikiManage.vue') },
       { path: 'community/node/list', name: 'AdminNodes', component: () => import('@/pages/admin/NodeManage.vue') },
-      { path: 'crawl/rule/list', name: 'AdminRules', component: () => import('@/pages/admin/RuleManage.vue') },
       { path: 'reading/list', name: 'AdminReadings', component: () => import('@/pages/admin/ReadingManage.vue') },
       { path: 'setting', name: 'AdminSetting', component: () => import('@/pages/admin/SettingManage.vue') },
     ],
