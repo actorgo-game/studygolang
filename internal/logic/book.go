@@ -315,6 +315,43 @@ func (this *book) BroadcastToOthersMessage(message *Message, myself int) {
 	}
 }
 
+// TouchUser 通过 HTTP 心跳标记用户活跃（60 秒内无心跳视为离线）
+func (this *book) TouchUser(uid int) {
+	this.rwMutex.Lock()
+	defer this.rwMutex.Unlock()
+
+	if uid == 0 {
+		return
+	}
+
+	if userData, ok := this.users[uid]; ok {
+		userData.lastAccessTime = time.Now()
+	} else {
+		this.users[uid] = &UserData{
+			serverMsgQueue: make(map[int]chan *Message),
+			lastAccessTime: time.Now(),
+		}
+		this.uids[uid] = struct{}{}
+
+		go this.newUser2Redis(uid)
+	}
+}
+
+// CleanInactiveUsers 清理超过 timeout 没有心跳的用户
+func (this *book) CleanInactiveUsers(timeout time.Duration) {
+	this.rwMutex.Lock()
+	defer this.rwMutex.Unlock()
+
+	now := time.Now()
+	for uid, userData := range this.users {
+		if now.Sub(userData.lastAccessTime) > timeout {
+			delete(this.users, uid)
+			delete(this.uids, uid)
+			go this.delUserFromRedis(uid)
+		}
+	}
+}
+
 // ClearRedisUser 删除 redis 中的用户
 func (this *book) ClearRedisUser() {
 	if !this.isStoreRedis() {

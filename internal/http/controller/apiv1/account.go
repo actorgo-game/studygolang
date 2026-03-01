@@ -17,6 +17,7 @@ func (self AccountController) RegisterRoute(g *echo.Group) {
 	g.GET("/account/logout", self.Logout)
 	g.GET("/user/current", self.CurrentUser)
 	g.POST("/account/changepwd", self.ChangePwd)
+	g.GET("/user/heartbeat", self.Heartbeat)
 }
 
 func (AccountController) Login(ctx echo.Context) error {
@@ -57,6 +58,22 @@ func (AccountController) CurrentUser(ctx echo.Context) error {
 		return success(ctx, nil)
 	}
 	return success(ctx, me)
+}
+
+func (AccountController) Heartbeat(ctx echo.Context) error {
+	me, ok := ctx.Get("user").(*model.Me)
+	uid := 0
+	msgnum := 0
+	if ok && me.Uid > 0 {
+		uid = me.Uid
+		msgnum = logic.DefaultMessage.FindNotReadMsgNum(context.EchoContext(ctx), uid)
+	}
+	logic.Book.TouchUser(uid)
+	return success(ctx, map[string]interface{}{
+		"online":    logic.Book.Len(),
+		"maxonline": logic.MaxOnlineNum(),
+		"msgnum":    msgnum,
+	})
 }
 
 func (AccountController) ChangePwd(ctx echo.Context) error {

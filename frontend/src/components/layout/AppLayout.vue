@@ -1,22 +1,10 @@
 <script setup lang="ts">
-import { watch } from 'vue'
 import AppHeader from './AppHeader.vue'
 import AppFooter from './AppFooter.vue'
 import AppSidebar from './AppSidebar.vue'
-import { useWebSocket } from '@/composables/useWebSocket'
-import { useUserStore } from '@/stores/user'
+import { useHeartbeat } from '@/composables/useHeartbeat'
 
-const userStore = useUserStore()
-
-watch(
-  () => userStore.isLoggedIn,
-  (loggedIn) => {
-    if (loggedIn) {
-      useWebSocket()
-    }
-  },
-  { immediate: true }
-)
+useHeartbeat()
 </script>
 
 <template>

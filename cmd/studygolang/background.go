@@ -83,6 +83,11 @@ func ServeBackGround() {
 	// 两分钟刷一次浏览数（TODO：重启丢失问题？信号控制重启？）
 	c.AddFunc("@every 2m", logic.Views.Flush)
 
+	// 每分钟清理超过 60 秒没有心跳的不活跃用户
+	c.AddFunc("@every 1m", func() {
+		logic.Book.CleanInactiveUsers(60 * time.Second)
+	})
+
 	c.Start()
 }
 
