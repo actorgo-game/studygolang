@@ -20,8 +20,7 @@ const menuOptions = [
   { label: '项目', key: '/projects' },
   { label: '资源', key: '/resources' },
   { label: '图书', key: '/books' },
-  { label: '晨读', key: '/readings' },
-  { label: 'Wiki', key: '/wiki' },
+  { label: '下载', key: 'https://go.dev/dl/' },
 ]
 
 const userMenuOptions = computed(() => {
@@ -42,7 +41,11 @@ const userMenuOptions = computed(() => {
 })
 
 function onMenuSelect(key: string) {
-  router.push(key)
+  if (key.startsWith('http')) {
+    window.open(key, '_blank')
+  } else {
+    router.push(key)
+  }
 }
 
 function onSearch() {

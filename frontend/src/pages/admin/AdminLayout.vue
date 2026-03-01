@@ -2,7 +2,7 @@
 import { ref, computed, h } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { NLayout, NLayoutSider, NLayoutContent, NMenu, NIcon, NText, NSpace, NButton } from 'naive-ui'
-import { PeopleOutline, ChatbubblesOutline, LibraryOutline, GitNetworkOutline, ReaderOutline, SettingsOutline, HomeOutline, NewspaperOutline, GlobeOutline, BookOutline, DocumentTextOutline, FolderOpenOutline } from '@vicons/ionicons5'
+import { PeopleOutline, ChatbubblesOutline, GitNetworkOutline, SettingsOutline, HomeOutline, NewspaperOutline, GlobeOutline, BookOutline, FolderOpenOutline } from '@vicons/ionicons5'
 
 const route = useRoute()
 const router = useRouter()
@@ -18,9 +18,7 @@ const menuOptions = [
   { label: '文章管理', key: '/admin/crawl/article/list', icon: renderIcon(NewspaperOutline) },
   { label: '资源管理', key: '/admin/resource/list', icon: renderIcon(FolderOpenOutline) },
   { label: '图书管理', key: '/admin/book/list', icon: renderIcon(BookOutline) },
-  { label: 'Wiki管理', key: '/admin/wiki/list', icon: renderIcon(DocumentTextOutline) },
   { label: '节点管理', key: '/admin/community/node/list', icon: renderIcon(GitNetworkOutline) },
-  { label: '晨读管理', key: '/admin/reading/list', icon: renderIcon(ReaderOutline) },
   { label: '系统设置', key: '/admin/setting', icon: renderIcon(SettingsOutline) },
 ]
 

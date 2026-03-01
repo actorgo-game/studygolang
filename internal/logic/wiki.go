@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/studygolang/studygolang/db"
 	"github.com/studygolang/studygolang/internal/model"
@@ -21,6 +22,7 @@ import (
 	"github.com/polaris1119/logger"
 	"github.com/polaris1119/set"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -158,7 +160,9 @@ func (WikiLogic) FindOne(ctx context.Context, uri string) *model.Wiki {
 
 	wiki := &model.Wiki{}
 	if err := db.GetCollection("wiki").FindOne(ctx, bson.M{"uri": uri}).Decode(wiki); err != nil {
-		objLog.Errorln("wiki logic FindOne error:", err)
+		if err != mongo.ErrNoDocuments {
+			objLog.Errorln("wiki logic FindOne error:", err)
+		}
 		return nil
 	}
 
@@ -257,4 +261,36 @@ func (WikiLogic) Total() int64 {
 	ctx := context.Background()
 	total, _ := db.GetCollection("wiki").CountDocuments(ctx, bson.M{})
 	return total
+}
+
+type WikiComment struct{}
+
+func (self WikiComment) UpdateComment(cid, objid, uid int, cmttime time.Time) {
+	ctx := context.Background()
+	_, err := db.GetCollection("wiki").UpdateOne(ctx, bson.M{"_id": objid}, bson.M{
+		"$inc": bson.M{"cmtnum": 1},
+	})
+	if err != nil {
+		logger.Errorln("更新Wiki评论数失败：", err)
+	}
+}
+
+func (self WikiComment) String() string {
+	return "wiki"
+}
+
+func (self WikiComment) SetObjinfo(ids []int, commentMap map[int][]*model.Comment) {
+	wikis := DefaultWiki.FindByIds(ids)
+	if len(wikis) == 0 {
+		return
+	}
+	for _, wiki := range wikis {
+		objinfo := make(map[string]interface{})
+		objinfo["title"] = wiki.Title
+		objinfo["uri"] = model.PathUrlMap[model.TypeWiki]
+		objinfo["type_name"] = model.TypeNameMap[model.TypeWiki]
+		for _, comment := range commentMap[wiki.Id] {
+			comment.Objinfo = objinfo
+		}
+	}
 }

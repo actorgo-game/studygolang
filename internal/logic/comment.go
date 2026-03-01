@@ -230,7 +230,7 @@ func (self CommentLogic) FindRecent(ctx context.Context, uid, objtype, limit int
 		model.TypeTopic:     TopicComment{},
 		model.TypeArticle:   ArticleComment{},
 		model.TypeResource:  ResourceComment{},
-		model.TypeWiki:      nil,
+		model.TypeWiki:      WikiComment{},
 		model.TypeProject:   ProjectComment{},
 		model.TypeBook:      BookComment{},
 		model.TypeInterview: InterviewComment{},
@@ -351,7 +351,7 @@ func (CommentLogic) Modify(ctx context.Context, cid int, content string) (errMsg
 
 // fillObjinfos 填充评论对应的主体信息
 func (CommentLogic) fillObjinfos(comments []*model.Comment, cmtObj CommentObjecter) {
-	if len(comments) == 0 {
+	if len(comments) == 0 || cmtObj == nil {
 		return
 	}
 	count := len(comments)
@@ -493,7 +493,7 @@ func (self CommentLogic) FindAll(ctx context.Context, paginator *Paginator, orde
 		model.TypeTopic:     TopicComment{},
 		model.TypeArticle:   ArticleComment{},
 		model.TypeResource:  ResourceComment{},
-		model.TypeWiki:      nil,
+		model.TypeWiki:      WikiComment{},
 		model.TypeProject:   ProjectComment{},
 		model.TypeBook:      BookComment{},
 		model.TypeInterview: InterviewComment{},
@@ -624,5 +624,7 @@ func decrementCommentCount(objid, objtype int) {
 		db.GetCollection("open_project").UpdateOne(ctx, bson.M{"_id": objid}, bson.M{"$inc": bson.M{"cmtnum": -1}})
 	case model.TypeBook:
 		db.GetCollection("book").UpdateOne(ctx, bson.M{"_id": objid}, bson.M{"$inc": bson.M{"cmtnum": -1}})
+	case model.TypeWiki:
+		db.GetCollection("wiki").UpdateOne(ctx, bson.M{"_id": objid}, bson.M{"$inc": bson.M{"cmtnum": -1}})
 	}
 }

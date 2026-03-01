@@ -42,6 +42,7 @@ func init() {
 	RegisterCommentObject(model.TypeTopic, TopicComment{})
 	RegisterCommentObject(model.TypeArticle, ArticleComment{})
 	RegisterCommentObject(model.TypeResource, ResourceComment{})
+	RegisterCommentObject(model.TypeWiki, WikiComment{})
 	RegisterCommentObject(model.TypeProject, ProjectComment{})
 	RegisterCommentObject(model.TypeBook, BookComment{})
 	RegisterCommentObject(model.TypeInterview, InterviewComment{})

@@ -22,7 +22,6 @@ const cards = [
   { label: '资源数量', key: 'resource', path: '/admin/resource/list' },
   { label: '项目数量', key: 'project', path: '' },
   { label: '图书数量', key: 'book', path: '/admin/book/list' },
-  { label: 'Wiki数量', key: 'wiki', path: '/admin/wiki/list' },
 ]
 </script>
 
