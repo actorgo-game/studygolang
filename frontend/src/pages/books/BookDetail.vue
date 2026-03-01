@@ -2,10 +2,10 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { NCard, NSpace, NText, NButton, NImage, NIcon, NSpin, useMessage } from 'naive-ui'
-import { HeartOutline, BookmarkOutline, CartOutline } from '@vicons/ionicons5'
+import { HeartOutline, Heart, CartOutline } from '@vicons/ionicons5'
 import type { Book } from '@/types'
 import { getBookDetail } from '@/api/book'
-import { toggleLike, toggleFavorite } from '@/api/interact'
+import { toggleLike, hadLike } from '@/api/interact'
 import { renderMarkdown } from '@/utils/markdown'
 import { useUserStore } from '@/stores/user'
 import { useAppStore } from '@/stores/app'
@@ -17,16 +17,29 @@ const appStore = useAppStore()
 const message = useMessage()
 const book = ref<Book | null>(null)
 const loading = ref(true)
+const liked = ref(false)
 
 onMounted(async () => {
-  try { const data = await getBookDetail(Number(route.params.id)); book.value = data?.book || null } catch {}
+  try {
+    const data = await getBookDetail(Number(route.params.id))
+    book.value = data?.book || null
+    if (userStore.isLoggedIn && book.value) {
+      hadLike(book.value.id, 5).then(res => { liked.value = res?.liked ?? false }).catch(() => {})
+    }
+  } catch {}
   loading.value = false
 })
 
 async function handleLike() {
   if (!userStore.isLoggedIn) { appStore.openLoginModal(); return }
   if (!book.value) return
-  try { await toggleLike(book.value.id, { objtype: 5 }); book.value.likenum++; message.success('推荐成功') } catch (e: any) { message.error(e.message) }
+  try {
+    const res = await toggleLike(book.value.id, { objtype: 5 })
+    const nowLiked = res?.liked ?? false
+    book.value.likenum += nowLiked ? 1 : -1
+    liked.value = nowLiked
+    message.success(nowLiked ? '推荐成功' : '已取消推荐')
+  } catch (e: any) { message.error(e.message) }
 }
 </script>
 
@@ -51,7 +64,7 @@ async function handleLike() {
       </div>
       <div class="markdown-body" v-html="renderMarkdown(book.desc)" />
       <NSpace style="margin-top: 24px" :size="12">
-        <NButton @click="handleLike" quaternary><template #icon><NIcon :component="HeartOutline" /></template>{{ book.likenum }} 推荐</NButton>
+        <NButton @click="handleLike" quaternary :type="liked ? 'error' : 'default'"><template #icon><NIcon :component="liked ? Heart : HeartOutline" /></template>{{ book.likenum }} 推荐</NButton>
       </NSpace>
       <CommentList :objid="book.id" :objtype="5" style="margin-top: 24px" />
     </NCard>

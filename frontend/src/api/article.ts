@@ -16,3 +16,7 @@ export function createArticle(data: Record<string, any>) {
 export function modifyArticle(data: Record<string, any>) {
   return postForm('/articles/modify', data)
 }
+
+export function deleteArticle(id: number) {
+  return postForm('/articles/delete', { id })
+}

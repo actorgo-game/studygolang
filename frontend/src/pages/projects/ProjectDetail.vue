@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { NCard, NSpace, NText, NButton, NIcon, NTag, NSpin, useMessage } from 'naive-ui'
-import { HeartOutline, BookmarkOutline, LogoGithub, LinkOutline } from '@vicons/ionicons5'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { NCard, NSpace, NText, NButton, NIcon, NTag, NSpin, NPopconfirm, useMessage } from 'naive-ui'
+import { HeartOutline, Heart, BookmarkOutline, Bookmark, LogoGithub, LinkOutline, TrashOutline } from '@vicons/ionicons5'
 import type { Project } from '@/types'
-import { getProjectDetail } from '@/api/project'
-import { toggleLike, toggleFavorite } from '@/api/interact'
+import { getProjectDetail, deleteProject } from '@/api/project'
+import { toggleLike, hadLike, toggleFavorite, hadFavorite } from '@/api/interact'
 import { timeAgo } from '@/utils/time'
 import { renderMarkdown } from '@/utils/markdown'
 import { useUserStore } from '@/stores/user'
@@ -13,26 +13,55 @@ import { useAppStore } from '@/stores/app'
 import CommentList from '@/components/comment/CommentList.vue'
 
 const route = useRoute()
+const router = useRouter()
 const userStore = useUserStore()
 const appStore = useAppStore()
 const message = useMessage()
+const isOwner = computed(() => userStore.me && project.value && (project.value.username === userStore.me.username || userStore.isAdmin))
 const project = ref<Project | null>(null)
 const loading = ref(true)
+const liked = ref(false)
+const favorited = ref(false)
 
 onMounted(async () => {
-  try { const data = await getProjectDetail(String(route.params.uri)); project.value = data?.project || null } catch {}
+  try {
+    const data = await getProjectDetail(String(route.params.uri))
+    project.value = data?.project || null
+    if (userStore.isLoggedIn && project.value) {
+      hadLike(project.value.id, 4).then(res => { liked.value = res?.liked ?? false }).catch(() => {})
+      hadFavorite(project.value.id, 4).then(res => { favorited.value = res?.favorited ?? false }).catch(() => {})
+    }
+  } catch {}
   loading.value = false
 })
 
 async function handleLike() {
   if (!userStore.isLoggedIn) { appStore.openLoginModal(); return }
   if (!project.value) return
-  try { await toggleLike(project.value.id, { objtype: 4 }); project.value.likenum++; message.success('点赞成功') } catch (e: any) { message.error(e.message) }
+  try {
+    const res = await toggleLike(project.value.id, { objtype: 4 })
+    const nowLiked = res?.liked ?? false
+    project.value.likenum += nowLiked ? 1 : -1
+    liked.value = nowLiked
+    message.success(nowLiked ? '点赞成功' : '已取消点赞')
+  } catch (e: any) { message.error(e.message) }
 }
 async function handleFavorite() {
   if (!userStore.isLoggedIn) { appStore.openLoginModal(); return }
   if (!project.value) return
-  try { await toggleFavorite(project.value.id, { objtype: 4 }); message.success('收藏成功') } catch (e: any) { message.error(e.message) }
+  try {
+    const res = await toggleFavorite(project.value.id, { objtype: 4 })
+    favorited.value = res?.favorited ?? false
+    message.success(favorited.value ? '收藏成功' : '已取消收藏')
+  } catch (e: any) { message.error(e.message) }
+}
+async function handleDelete() {
+  if (!project.value) return
+  try {
+    await deleteProject(project.value.id)
+    message.success('删除成功')
+    router.push('/projects')
+  } catch (e: any) { message.error(e.message) }
 }
 </script>
 
@@ -55,8 +84,9 @@ async function handleFavorite() {
       <NSpace v-if="project.tags" :size="4" style="margin-bottom: 12px"><NTag v-for="tag in project.tags.split(',')" :key="tag" size="small" round>{{ tag.trim() }}</NTag></NSpace>
       <div class="markdown-body" v-html="renderMarkdown(project.desc)" />
       <NSpace style="margin-top: 24px" :size="12">
-        <NButton @click="handleLike" quaternary><template #icon><NIcon :component="HeartOutline" /></template>{{ project.likenum }} 赞</NButton>
-        <NButton @click="handleFavorite" quaternary><template #icon><NIcon :component="BookmarkOutline" /></template>收藏</NButton>
+        <NButton @click="handleLike" quaternary :type="liked ? 'error' : 'default'"><template #icon><NIcon :component="liked ? Heart : HeartOutline" /></template>{{ project.likenum }} 赞</NButton>
+        <NButton @click="handleFavorite" quaternary :type="favorited ? 'warning' : 'default'"><template #icon><NIcon :component="favorited ? Bookmark : BookmarkOutline" /></template>{{ favorited ? '已收藏' : '收藏' }}</NButton>
+        <NPopconfirm v-if="isOwner" @positive-click="handleDelete"><template #trigger><NButton quaternary type="error"><template #icon><NIcon :component="TrashOutline" /></template>删除</NButton></template>确定要删除这个项目吗？</NPopconfirm>
       </NSpace>
       <CommentList :objid="project.id" :objtype="4" style="margin-top: 24px" />
     </NCard>

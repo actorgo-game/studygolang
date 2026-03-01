@@ -13,6 +13,7 @@ type CommentController struct{}
 func (self CommentController) RegisterRoute(g *echo.Group) {
 	g.GET("/object/comments", self.CommentList)
 	g.POST("/comment/:objid", self.Create)
+	g.POST("/comment/delete", self.Delete)
 	g.GET("/at/users", self.AtUsers)
 }
 
@@ -39,6 +40,19 @@ func (CommentController) Create(ctx echo.Context) error {
 	}
 	objid := goutils.MustInt(ctx.Param("objid"))
 	_, err := logic.DefaultComment.Publish(context.EchoContext(ctx), meVal.Uid, objid, ctx.Request().Form)
+	if err != nil {
+		return fail(ctx, err.Error())
+	}
+	return success(ctx, nil)
+}
+
+func (CommentController) Delete(ctx echo.Context) error {
+	meVal := me(ctx)
+	if meVal.Uid == 0 {
+		return fail(ctx, "请先登录")
+	}
+	cid := goutils.MustInt(ctx.FormValue("cid"))
+	err := logic.DefaultComment.Delete(context.EchoContext(ctx), cid, meVal.Uid, meVal.IsRoot)
 	if err != nil {
 		return fail(ctx, err.Error())
 	}

@@ -7,6 +7,7 @@
 package logic
 
 import (
+	"errors"
 	"fmt"
 	"html/template"
 	"math"
@@ -586,4 +587,17 @@ func buildCommentSort(orderBy string) bson.D {
 		sort = append(sort, bson.E{Key: field, Value: dir})
 	}
 	return sort
+}
+
+func (CommentLogic) Delete(ctx context.Context, cid, uid int, isRoot bool) error {
+	comment := &model.Comment{}
+	err := db.GetCollection("comments").FindOne(ctx, bson.M{"_id": cid}).Decode(comment)
+	if err != nil {
+		return errors.New("评论不存在")
+	}
+	if comment.Uid != uid && !isRoot {
+		return errors.New("无权删除")
+	}
+	_, err = db.GetCollection("comments").DeleteOne(ctx, bson.M{"_id": cid})
+	return err
 }

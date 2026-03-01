@@ -36,3 +36,7 @@ export function getNodes() {
 export function setTopicTop(data: { tid: number; top: number }) {
   return postForm('/topic/set_top', data)
 }
+
+export function deleteTopic(tid: number) {
+  return postForm('/topics/delete', { tid })
+}

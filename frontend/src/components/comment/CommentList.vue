@@ -1,11 +1,24 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import { NList, NListItem, NAvatar, NSpace, NText, NButton, NPagination, NEmpty } from 'naive-ui'
+import { NList, NListItem, NAvatar, NSpace, NText, NButton, NIcon, NPagination, NEmpty, NPopconfirm, useMessage } from 'naive-ui'
+import { TrashOutline } from '@vicons/ionicons5'
 import type { Comment } from '@/types'
-import { getComments } from '@/api/comment'
+import { getComments, deleteComment } from '@/api/comment'
 import { timeAgo } from '@/utils/time'
 import { renderMarkdown } from '@/utils/markdown'
+import { useUserStore } from '@/stores/user'
 import CommentForm from './CommentForm.vue'
+
+const userStore = useUserStore()
+const message = useMessage()
+
+async function handleDeleteComment(cid: number) {
+  try {
+    await deleteComment(cid)
+    message.success('删除成功')
+    loadComments()
+  } catch (e: any) { message.error(e.message) }
+}
 
 const props = defineProps<{
   objid: number
@@ -57,6 +70,12 @@ onMounted(loadComments)
               </router-link>
               <NText depth="3" style="font-size: 12px">#{{ c.floor }}</NText>
               <NText depth="3" style="font-size: 12px">{{ timeAgo(c.ctime) }}</NText>
+              <NPopconfirm v-if="userStore.me && (c.uid === userStore.me.uid || userStore.isAdmin)" @positive-click="handleDeleteComment(c.cid)">
+                <template #trigger>
+                  <NButton quaternary size="tiny" type="error"><template #icon><NIcon :component="TrashOutline" size="12" /></template></NButton>
+                </template>
+                确定要删除这条评论吗？
+              </NPopconfirm>
             </NSpace>
             <div class="comment-content" v-html="renderMarkdown(c.content)" />
           </div>

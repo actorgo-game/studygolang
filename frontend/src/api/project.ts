@@ -16,3 +16,7 @@ export function createProject(data: Record<string, any>) {
 export function modifyProject(data: Record<string, any>) {
   return postForm('/project/modify', data)
 }
+
+export function deleteProject(id: number) {
+  return postForm('/project/delete', { id })
+}

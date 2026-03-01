@@ -1,11 +1,19 @@
 import { get, postForm } from './request'
 
-export function toggleLike(objid: number, data: { objtype: number; flag?: number }) {
-  return postForm(`/like/${objid}`, data)
+export function toggleLike(objid: number, data: { objtype: number }) {
+  return postForm<{ liked: boolean }>(`/like/${objid}`, data)
 }
 
-export function toggleFavorite(objid: number, data: { objtype: number; collect?: number }) {
-  return postForm(`/favorite/${objid}`, data)
+export function hadLike(objid: number, objtype: number) {
+  return get<{ liked: boolean }>(`/like/${objid}`, { objtype })
+}
+
+export function toggleFavorite(objid: number, data: { objtype: number }) {
+  return postForm<{ favorited: boolean }>(`/favorite/${objid}`, data)
+}
+
+export function hadFavorite(objid: number, objtype: number) {
+  return get<{ favorited: boolean }>(`/favorite/${objid}`, { objtype })
 }
 
 export function getFavorites(username: string, params: { p?: number }) {

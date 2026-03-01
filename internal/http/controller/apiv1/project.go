@@ -16,6 +16,7 @@ func (self ProjectController) RegisterRoute(g *echo.Group) {
 	g.GET("/projects", self.ReadList)
 	g.GET("/project/detail", self.Detail)
 	g.POST("/project/new", self.Create)
+	g.POST("/project/delete", self.Delete)
 }
 
 func (ProjectController) ReadList(ctx echo.Context) error {
@@ -39,6 +40,19 @@ func (ProjectController) Detail(ctx echo.Context) error {
 	}
 	logic.Views.Incr(Request(ctx), model.TypeProject, project.Id)
 	return success(ctx, map[string]interface{}{"project": project})
+}
+
+func (ProjectController) Delete(ctx echo.Context) error {
+	meVal := me(ctx)
+	if meVal.Uid == 0 {
+		return fail(ctx, "请先登录")
+	}
+	id := goutils.MustInt(ctx.FormValue("id"))
+	err := logic.DefaultProject.Delete(context.EchoContext(ctx), id, meVal.Username, meVal.IsRoot)
+	if err != nil {
+		return fail(ctx, err.Error())
+	}
+	return success(ctx, nil)
 }
 
 func (ProjectController) Create(ctx echo.Context) error {

@@ -17,12 +17,13 @@ func (self ArticleController) RegisterRoute(g *echo.Group) {
 	g.GET("/article/detail", self.Detail)
 	g.POST("/articles/new", self.Create)
 	g.POST("/articles/modify", self.Modify)
+	g.POST("/articles/delete", self.Delete)
 }
 
 func (ArticleController) ReadList(ctx echo.Context) error {
 	curPage := goutils.MustInt(ctx.QueryParam("p"), 1)
 	paginator := logic.NewPaginatorWithPerPage(curPage, perPage)
-	articles := logic.DefaultArticle.FindAll(context.EchoContext(ctx), paginator, "articles", "")
+	articles := logic.DefaultArticle.FindAll(context.EchoContext(ctx), paginator, "", "")
 	total := logic.DefaultArticle.Count(context.EchoContext(ctx), "")
 	return success(ctx, map[string]interface{}{
 		"list":     articles,
@@ -51,6 +52,19 @@ func (ArticleController) Create(ctx echo.Context) error {
 		return fail(ctx, "请先登录")
 	}
 	_, err := logic.DefaultArticle.Publish(context.EchoContext(ctx), meVal, ctx.Request().Form)
+	if err != nil {
+		return fail(ctx, err.Error())
+	}
+	return success(ctx, nil)
+}
+
+func (ArticleController) Delete(ctx echo.Context) error {
+	meVal := me(ctx)
+	if meVal.Uid == 0 {
+		return fail(ctx, "请先登录")
+	}
+	id := goutils.MustInt(ctx.FormValue("id"))
+	err := logic.DefaultArticle.Delete(context.EchoContext(ctx), id, meVal.Username, meVal.IsRoot)
 	if err != nil {
 		return fail(ctx, err.Error())
 	}

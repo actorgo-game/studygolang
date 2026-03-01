@@ -990,3 +990,16 @@ func (self TopicLike) UpdateLike(objid, num int) {
 func (self TopicLike) String() string {
 	return "topic"
 }
+
+func (TopicLogic) Delete(ctx context.Context, tid, uid int, isRoot bool) error {
+	topic := &model.Topic{}
+	err := db.GetCollection("topics").FindOne(ctx, bson.M{"_id": tid}).Decode(topic)
+	if err != nil {
+		return errors.New("主题不存在")
+	}
+	if topic.Uid != uid && !isRoot {
+		return errors.New("无权删除")
+	}
+	_, err = db.GetCollection("topics").UpdateOne(ctx, bson.M{"_id": tid}, bson.M{"$set": bson.M{"flag": model.FlagUserDelete}})
+	return err
+}

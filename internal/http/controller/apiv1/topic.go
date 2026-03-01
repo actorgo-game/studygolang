@@ -20,6 +20,7 @@ func (self TopicController) RegisterRoute(g *echo.Group) {
 	g.GET("/nodes", self.Nodes)
 	g.POST("/topics/new", self.Create)
 	g.POST("/topics/modify", self.Modify)
+	g.POST("/topics/delete", self.Delete)
 	g.POST("/topic/set_top", self.SetTop)
 }
 
@@ -27,7 +28,7 @@ func (TopicController) TopicList(ctx echo.Context) error {
 	curPage := goutils.MustInt(ctx.QueryParam("p"), 1)
 	tab := ctx.QueryParam("tab")
 	paginator := logic.NewPaginatorWithPerPage(curPage, perPage)
-	topics := logic.DefaultTopic.FindAll(context.EchoContext(ctx), paginator, "topics", tab)
+	topics := logic.DefaultTopic.FindAll(context.EchoContext(ctx), paginator, "", tab)
 	total := logic.DefaultTopic.Count(context.EchoContext(ctx), tab)
 	return success(ctx, map[string]interface{}{
 		"list":     topics,
@@ -40,7 +41,7 @@ func (TopicController) TopicList(ctx echo.Context) error {
 func (TopicController) TopicsLast(ctx echo.Context) error {
 	curPage := goutils.MustInt(ctx.QueryParam("p"), 1)
 	paginator := logic.NewPaginatorWithPerPage(curPage, perPage)
-	topics := logic.DefaultTopic.FindAll(context.EchoContext(ctx), paginator, "topics", "last")
+	topics := logic.DefaultTopic.FindAll(context.EchoContext(ctx), paginator, "", "last")
 	return success(ctx, map[string]interface{}{
 		"list": topics,
 		"page": curPage,
@@ -64,7 +65,7 @@ func (TopicController) NodeTopics(ctx echo.Context) error {
 	curPage := goutils.MustInt(ctx.QueryParam("p"), 1)
 	nid := goutils.MustInt(ctx.Param("nid"))
 	paginator := logic.NewPaginatorWithPerPage(curPage, perPage)
-	topics := logic.DefaultTopic.FindAll(context.EchoContext(ctx), paginator, "topics", "", nid)
+	topics := logic.DefaultTopic.FindAll(context.EchoContext(ctx), paginator, "", "", nid)
 	return success(ctx, map[string]interface{}{
 		"list": topics,
 		"page": curPage,
@@ -96,6 +97,19 @@ func (TopicController) Modify(ctx echo.Context) error {
 	errMsg, err := logic.DefaultTopic.Modify(context.EchoContext(ctx), meVal, ctx.Request().Form)
 	if err != nil {
 		return fail(ctx, errMsg)
+	}
+	return success(ctx, nil)
+}
+
+func (TopicController) Delete(ctx echo.Context) error {
+	meVal := me(ctx)
+	if meVal.Uid == 0 {
+		return fail(ctx, "请先登录")
+	}
+	tid := goutils.MustInt(ctx.FormValue("tid"))
+	err := logic.DefaultTopic.Delete(context.EchoContext(ctx), tid, meVal.Uid, meVal.IsRoot)
+	if err != nil {
+		return fail(ctx, err.Error())
 	}
 	return success(ctx, nil)
 }

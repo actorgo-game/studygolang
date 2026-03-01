@@ -1465,3 +1465,16 @@ func (self ArticleLike) UpdateLike(objid, num int) {
 func (self ArticleLike) String() string {
 	return "article"
 }
+
+func (ArticleLogic) Delete(ctx context.Context, id int, username string, isRoot bool) error {
+	article := &model.Article{}
+	err := db.GetCollection("articles").FindOne(ctx, bson.M{"_id": id}).Decode(article)
+	if err != nil {
+		return errors.New("文章不存在")
+	}
+	if article.Author != username && article.OpUser != username && !isRoot {
+		return errors.New("无权删除")
+	}
+	_, err = db.GetCollection("articles").DeleteOne(ctx, bson.M{"_id": id})
+	return err
+}

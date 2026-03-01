@@ -656,3 +656,16 @@ func buildFilter(querystring string, args ...interface{}) bson.M {
 
 	return filter
 }
+
+func (ProjectLogic) Delete(ctx context.Context, id int, username string, isRoot bool) error {
+	project := &model.OpenProject{}
+	err := db.GetCollection("open_project").FindOne(ctx, bson.M{"_id": id}).Decode(project)
+	if err != nil {
+		return errors.New("项目不存在")
+	}
+	if project.Username != username && !isRoot {
+		return errors.New("无权删除")
+	}
+	_, err = db.GetCollection("open_project").DeleteOne(ctx, bson.M{"_id": id})
+	return err
+}

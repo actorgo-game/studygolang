@@ -13,6 +13,10 @@ export function modifyComment(cid: number, data: { content: string }) {
   return postForm(`/object/comments/${cid}`, data)
 }
 
+export function deleteComment(cid: number) {
+  return postForm('/comment/delete', { cid })
+}
+
 export function getAtUsers(params: { term: string }) {
   return get<string[]>('/at/users', params)
 }

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { NCard, NSpace, NText, NAvatar, NTag, NButton, NIcon, NSpin, useMessage } from 'naive-ui'
-import { HeartOutline, BookmarkOutline, ShareSocialOutline } from '@vicons/ionicons5'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { NCard, NSpace, NText, NAvatar, NTag, NButton, NIcon, NSpin, NPopconfirm, useMessage } from 'naive-ui'
+import { HeartOutline, Heart, BookmarkOutline, Bookmark, TrashOutline } from '@vicons/ionicons5'
 import type { Topic } from '@/types'
-import { getTopicDetail } from '@/api/topic'
-import { toggleLike, toggleFavorite } from '@/api/interact'
+import { getTopicDetail, deleteTopic } from '@/api/topic'
+import { toggleLike, hadLike, toggleFavorite, hadFavorite } from '@/api/interact'
 import { timeAgo } from '@/utils/time'
 import { renderMarkdown } from '@/utils/markdown'
 import { useUserStore } from '@/stores/user'
@@ -13,12 +13,16 @@ import { useAppStore } from '@/stores/app'
 import CommentList from '@/components/comment/CommentList.vue'
 
 const route = useRoute()
+const router = useRouter()
 const userStore = useUserStore()
 const appStore = useAppStore()
 const message = useMessage()
+const isOwner = computed(() => userStore.me && topic.value && (topic.value.uid === userStore.me.uid || userStore.isAdmin))
 
 const topic = ref<Topic | null>(null)
 const loading = ref(true)
+const liked = ref(false)
+const favorited = ref(false)
 
 async function load() {
   loading.value = true
@@ -26,6 +30,10 @@ async function load() {
     const tid = Number(route.params.tid)
     const data = await getTopicDetail(tid)
     topic.value = data?.topic || null
+    if (userStore.isLoggedIn && topic.value) {
+      hadLike(topic.value.tid, 0).then(res => { liked.value = res?.liked ?? false }).catch(() => {})
+      hadFavorite(topic.value.tid, 0).then(res => { favorited.value = res?.favorited ?? false }).catch(() => {})
+    }
   } catch {}
   loading.value = false
 }
@@ -34,9 +42,11 @@ async function handleLike() {
   if (!userStore.isLoggedIn) { appStore.openLoginModal(); return }
   if (!topic.value) return
   try {
-    await toggleLike(topic.value.tid, { objtype: 0 })
-    topic.value.likenum++
-    message.success('点赞成功')
+    const res = await toggleLike(topic.value.tid, { objtype: 0 })
+    const nowLiked = res?.liked ?? false
+    topic.value.likenum += nowLiked ? 1 : -1
+    liked.value = nowLiked
+    message.success(nowLiked ? '点赞成功' : '已取消点赞')
   } catch (e: any) { message.error(e.message) }
 }
 
@@ -44,8 +54,18 @@ async function handleFavorite() {
   if (!userStore.isLoggedIn) { appStore.openLoginModal(); return }
   if (!topic.value) return
   try {
-    await toggleFavorite(topic.value.tid, { objtype: 0 })
-    message.success('收藏成功')
+    const res = await toggleFavorite(topic.value.tid, { objtype: 0 })
+    favorited.value = res?.favorited ?? false
+    message.success(favorited.value ? '收藏成功' : '已取消收藏')
+  } catch (e: any) { message.error(e.message) }
+}
+
+async function handleDelete() {
+  if (!topic.value) return
+  try {
+    await deleteTopic(topic.value.tid)
+    message.success('删除成功')
+    router.push('/topics')
   } catch (e: any) { message.error(e.message) }
 }
 
@@ -73,14 +93,23 @@ onMounted(load)
       <div class="markdown-body" v-html="renderMarkdown(topic.content)" />
 
       <NSpace style="margin-top: 24px" :size="12">
-        <NButton @click="handleLike" quaternary>
-          <template #icon><NIcon :component="HeartOutline" /></template>
+        <NButton @click="handleLike" quaternary :type="liked ? 'error' : 'default'">
+          <template #icon><NIcon :component="liked ? Heart : HeartOutline" /></template>
           {{ topic.likenum }} 赞
         </NButton>
-        <NButton @click="handleFavorite" quaternary>
-          <template #icon><NIcon :component="BookmarkOutline" /></template>
-          收藏
+        <NButton @click="handleFavorite" quaternary :type="favorited ? 'warning' : 'default'">
+          <template #icon><NIcon :component="favorited ? Bookmark : BookmarkOutline" /></template>
+          {{ favorited ? '已收藏' : '收藏' }}
         </NButton>
+        <NPopconfirm v-if="isOwner" @positive-click="handleDelete">
+          <template #trigger>
+            <NButton quaternary type="error">
+              <template #icon><NIcon :component="TrashOutline" /></template>
+              删除
+            </NButton>
+          </template>
+          确定要删除这个主题吗？
+        </NPopconfirm>
       </NSpace>
 
       <CommentList :objid="topic.tid" :objtype="0" style="margin-top: 24px" />

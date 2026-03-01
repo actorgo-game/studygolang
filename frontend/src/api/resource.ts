@@ -16,3 +16,7 @@ export function createResource(data: Record<string, any>) {
 export function modifyResource(data: Record<string, any>) {
   return postForm('/resources/modify', data)
 }
+
+export function deleteResource(id: number) {
+  return postForm('/resources/delete', { id })
+}
