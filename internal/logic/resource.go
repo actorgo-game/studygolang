@@ -7,6 +7,7 @@
 package logic
 
 import (
+	"errors"
 	"net/url"
 	"strconv"
 	"time"
