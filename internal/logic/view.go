@@ -21,6 +21,7 @@ import (
 	"github.com/polaris1119/goutils"
 	"github.com/polaris1119/logger"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type view struct {
@@ -48,9 +49,10 @@ func (this *view) flush() {
 	defer this.locker.Unlock()
 
 	ctx := context.Background()
+	upsert := options.Update().SetUpsert(true)
 	switch this.objtype {
 	case model.TypeTopic:
-		db.GetCollection("topics_ex").UpdateOne(ctx, bson.M{"_id": this.objid}, bson.M{"$inc": bson.M{"view": this.num}})
+		db.GetCollection("topics_ex").UpdateOne(ctx, bson.M{"tid": this.objid}, bson.M{"$inc": bson.M{"view": this.num}}, upsert)
 	case model.TypeArticle:
 		db.GetCollection("articles").UpdateOne(ctx, bson.M{"_id": this.objid}, bson.M{"$inc": bson.M{"viewnum": this.num}})
 	case model.TypeResource:

@@ -1,7 +1,17 @@
+function parseDate(dateStr: string): Date {
+  if (!dateStr) return new Date(NaN)
+  // Backend returns "YYYY-MM-DD HH:mm:ss"; replace space with T for reliable parsing
+  const iso = dateStr.includes('T') ? dateStr : dateStr.replace(' ', 'T')
+  return new Date(iso)
+}
+
 export function timeAgo(dateStr: string): string {
-  const date = new Date(dateStr)
+  const date = parseDate(dateStr)
+  if (isNaN(date.getTime()) || date.getFullYear() < 2000) return ''
+
   const now = new Date()
   const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+  if (seconds < 0) return '刚刚'
 
   if (seconds < 60) return '刚刚'
   if (seconds < 3600) return `${Math.floor(seconds / 60)} 分钟前`
@@ -13,7 +23,7 @@ export function timeAgo(dateStr: string): string {
 }
 
 export function formatDate(dateStr: string, fmt = 'YYYY-MM-DD'): string {
-  const d = new Date(dateStr)
+  const d = parseDate(dateStr)
   const map: Record<string, string> = {
     YYYY: String(d.getFullYear()),
     MM: String(d.getMonth() + 1).padStart(2, '0'),

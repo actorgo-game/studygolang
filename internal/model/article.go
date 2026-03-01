@@ -70,6 +70,13 @@ func (this *Article) BeforeInsert() {
 		this.Tags = AutoTag(this.Title, this.Txt, 4)
 	}
 	this.Lastreplytime = NewOftenTime()
+	now := OftenTime(time.Now())
+	if time.Time(this.Ctime).IsZero() {
+		this.Ctime = now
+	}
+	if time.Time(this.Mtime).IsZero() {
+		this.Mtime = now
+	}
 }
 
 func (this *Article) AfterInsert() {

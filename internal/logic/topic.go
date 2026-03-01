@@ -86,6 +86,9 @@ func (self TopicLogic) Publish(ctx context.Context, me *model.Me, form url.Value
 		}
 		topic.Uid = me.Uid
 		topic.Lastreplytime = model.NewOftenTime()
+		now := model.OftenTime(time.Now())
+		topic.Ctime = now
+		topic.Mtime = now
 
 		newID, idErr := db.NextID("topics")
 		if idErr != nil {
@@ -936,7 +939,7 @@ func (self TopicComment) UpdateComment(cid, objid, uid int, cmttime time.Time) {
 
 	_, err = db.GetCollection("topics_ex").UpdateOne(ctx, bson.M{"tid": objid}, bson.M{
 		"$inc": bson.M{"reply": 1},
-	})
+	}, options.Update().SetUpsert(true))
 	if err != nil {
 		logger.Errorln("更新主题回复数失败：", err)
 		return
@@ -978,7 +981,7 @@ func (self TopicLike) UpdateLike(objid, num int) {
 	ctx := context.Background()
 	_, err := db.GetCollection("topics_ex").UpdateOne(ctx, bson.M{"tid": objid}, bson.M{
 		"$inc": bson.M{"like": num},
-	})
+	}, options.Update().SetUpsert(true))
 	if err != nil {
 		logger.Errorln("更新主题喜欢数失败：", err)
 	}

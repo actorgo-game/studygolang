@@ -12,12 +12,24 @@ import (
 type SidebarController struct{}
 
 func (self SidebarController) RegisterRoute(g *echo.Group) {
+	g.GET("/websites/stat", self.SiteStat)
 	g.GET("/topics/recent", self.RecentTopics)
 	g.GET("/articles/recent", self.RecentArticles)
 	g.GET("/comments/recent", self.RecentComments)
 	g.GET("/nodes/hot", self.HotNodes)
 	g.GET("/rank/view", self.ViewRank)
 	g.GET("/friend/links", self.FriendLinks)
+}
+
+func (SidebarController) SiteStat(ctx echo.Context) error {
+	return success(ctx, map[string]interface{}{
+		"user":    logic.DefaultUser.Total(),
+		"topic":   logic.DefaultTopic.Total(),
+		"article": logic.DefaultArticle.Total(),
+		"resource": logic.DefaultResource.Total(),
+		"project": logic.DefaultProject.Total(),
+		"book":    logic.DefaultGoBook.Total(),
+	})
 }
 
 func (SidebarController) RecentTopics(ctx echo.Context) error {

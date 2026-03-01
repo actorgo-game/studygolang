@@ -61,6 +61,13 @@ func (this *Topic) BeforeInsert() {
 	if this.Tags == "" {
 		this.Tags = AutoTag(this.Title, this.Content, 4)
 	}
+	now := OftenTime(time.Now())
+	if time.Time(this.Ctime).IsZero() {
+		this.Ctime = now
+	}
+	if time.Time(this.Mtime).IsZero() {
+		this.Mtime = now
+	}
 }
 
 // 社区主题扩展（计数）信息

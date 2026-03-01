@@ -8,7 +8,11 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson/bsontype"
+	"go.mongodb.org/mongo-driver/x/bsonx/bsoncore"
 )
 
 type OftenTime time.Time
@@ -24,6 +28,41 @@ func (self OftenTime) String() string {
 		return "0000-00-00 00:00:00"
 	}
 	return t.Format("2006-01-02 15:04:05")
+}
+
+func (self OftenTime) MarshalBSONValue() (bsontype.Type, []byte, error) {
+	t := time.Time(self)
+	return bsontype.DateTime, bsoncore.AppendDateTime(nil, t.UnixMilli()), nil
+}
+
+func (this *OftenTime) UnmarshalBSONValue(bt bsontype.Type, data []byte) error {
+	switch bt {
+	case bsontype.DateTime:
+		ms, _, ok := bsoncore.ReadDateTime(data)
+		if !ok {
+			return errors.New("invalid BSON DateTime data")
+		}
+		*this = OftenTime(time.UnixMilli(ms))
+		return nil
+	case bsontype.String:
+		s, _, ok := bsoncore.ReadString(data)
+		if !ok {
+			return errors.New("invalid BSON String data")
+		}
+		t, err := time.ParseInLocation("2006-01-02 15:04:05", s, time.Local)
+		if err != nil {
+			return fmt.Errorf("OftenTime UnmarshalBSONValue parse string %q: %w", s, err)
+		}
+		*this = OftenTime(t)
+		return nil
+	case bsontype.EmbeddedDocument:
+		// legacy: old data was stored as empty document {} by StructCodec
+		return nil
+	case bsontype.Null:
+		return nil
+	default:
+		return fmt.Errorf("cannot decode BSON type %v into OftenTime", bt)
+	}
 }
 
 func (self OftenTime) MarshalBinary() ([]byte, error) {
@@ -46,8 +85,12 @@ func (self OftenTime) MarshalText() ([]byte, error) {
 }
 
 func (this *OftenTime) UnmarshalBinary(data []byte) error {
-	t := time.Time(*this)
-	return t.UnmarshalBinary(data)
+	var t time.Time
+	if err := t.UnmarshalBinary(data); err != nil {
+		return err
+	}
+	*this = OftenTime(t)
+	return nil
 }
 
 func (this *OftenTime) UnmarshalJSON(data []byte) (err error) {
@@ -57,20 +100,24 @@ func (this *OftenTime) UnmarshalJSON(data []byte) (err error) {
 	}
 
 	if str == `"0001-01-01 08:00:00"` {
-
-		ft := NewOftenTime()
-		this = &ft
+		*this = NewOftenTime()
 		return nil
 	}
 
 	var t time.Time
 	t, err = time.ParseInLocation(`"2006-01-02 15:04:05"`, str, time.Local)
+	if err != nil {
+		return
+	}
 	*this = OftenTime(t)
-
 	return
 }
 
 func (this *OftenTime) UnmarshalText(data []byte) (err error) {
-	t := time.Time(*this)
-	return t.UnmarshalText(data)
+	var t time.Time
+	if err = t.UnmarshalText(data); err != nil {
+		return
+	}
+	*this = OftenTime(t)
+	return
 }
