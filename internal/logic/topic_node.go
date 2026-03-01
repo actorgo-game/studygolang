@@ -134,6 +134,11 @@ func (self TopicNodeLogic) Modify(ctx context.Context, form url.Values) error {
 	return err
 }
 
+func (self TopicNodeLogic) Delete(ctx context.Context, nid int) error {
+	_, err := db.GetCollection("topics_node").DeleteOne(ctx, bson.M{"_id": nid})
+	return err
+}
+
 func (self TopicNodeLogic) ModifySeq(ctx context.Context, nid, seq int) error {
 	_, err := db.GetCollection("topics_node").UpdateOne(ctx, bson.M{"_id": nid}, bson.M{"$set": bson.M{"seq": seq}})
 	return err

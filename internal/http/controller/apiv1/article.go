@@ -51,7 +51,8 @@ func (ArticleController) Create(ctx echo.Context) error {
 	if meVal.Uid == 0 {
 		return fail(ctx, "请先登录")
 	}
-	_, err := logic.DefaultArticle.Publish(context.EchoContext(ctx), meVal, ctx.Request().Form)
+	formParams, _ := ctx.FormParams()
+	_, err := logic.DefaultArticle.Publish(context.EchoContext(ctx), meVal, formParams)
 	if err != nil {
 		return fail(ctx, err.Error())
 	}
@@ -76,7 +77,8 @@ func (ArticleController) Modify(ctx echo.Context) error {
 	if meVal.Uid == 0 {
 		return fail(ctx, "请先登录")
 	}
-	errMsg, err := logic.DefaultArticle.Modify(context.EchoContext(ctx), meVal, ctx.Request().Form)
+	formParams, _ := ctx.FormParams()
+	errMsg, err := logic.DefaultArticle.Modify(context.EchoContext(ctx), meVal, formParams)
 	if err != nil {
 		return fail(ctx, errMsg)
 	}

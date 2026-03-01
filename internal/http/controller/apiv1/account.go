@@ -36,7 +36,8 @@ func (AccountController) Login(ctx echo.Context) error {
 }
 
 func (AccountController) Register(ctx echo.Context) error {
-	errMsg, err := logic.DefaultUser.CreateUser(context.EchoContext(ctx), ctx.Request().Form)
+	formParams, _ := ctx.FormParams()
+	errMsg, err := logic.DefaultUser.CreateUser(context.EchoContext(ctx), formParams)
 	if err != nil {
 		return fail(ctx, errMsg)
 	}

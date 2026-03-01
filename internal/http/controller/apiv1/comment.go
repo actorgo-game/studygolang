@@ -1,6 +1,8 @@
 package apiv1
 
 import (
+	"net/url"
+
 	"github.com/studygolang/studygolang/context"
 	"github.com/studygolang/studygolang/internal/logic"
 
@@ -39,7 +41,14 @@ func (CommentController) Create(ctx echo.Context) error {
 		return fail(ctx, "请先登录")
 	}
 	objid := goutils.MustInt(ctx.Param("objid"))
-	_, err := logic.DefaultComment.Publish(context.EchoContext(ctx), meVal.Uid, objid, ctx.Request().Form)
+	content := ctx.FormValue("content")
+	if content == "" {
+		return fail(ctx, "评论内容不能为空")
+	}
+	form := url.Values{}
+	form.Set("objtype", ctx.FormValue("objtype"))
+	form.Set("content", content)
+	_, err := logic.DefaultComment.Publish(context.EchoContext(ctx), meVal.Uid, objid, form)
 	if err != nil {
 		return fail(ctx, err.Error())
 	}

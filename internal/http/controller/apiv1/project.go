@@ -60,7 +60,8 @@ func (ProjectController) Create(ctx echo.Context) error {
 	if meVal.Uid == 0 {
 		return fail(ctx, "请先登录")
 	}
-	err := logic.DefaultProject.Publish(context.EchoContext(ctx), meVal, ctx.Request().Form)
+	formParams, _ := ctx.FormParams()
+	err := logic.DefaultProject.Publish(context.EchoContext(ctx), meVal, formParams)
 	if err != nil {
 		return fail(ctx, err.Error())
 	}

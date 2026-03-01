@@ -15,6 +15,7 @@ type BookController struct{}
 func (self BookController) RegisterRoute(g *echo.Group) {
 	g.GET("/books", self.ReadList)
 	g.GET("/book/:id", self.Detail)
+	g.POST("/book/new", self.Create)
 	g.POST("/book/delete", self.Delete)
 }
 
@@ -39,6 +40,19 @@ func (BookController) Detail(ctx echo.Context) error {
 	}
 	logic.Views.Incr(Request(ctx), model.TypeBook, id)
 	return success(ctx, map[string]interface{}{"book": book})
+}
+
+func (BookController) Create(ctx echo.Context) error {
+	meVal := me(ctx)
+	if meVal.Uid == 0 {
+		return fail(ctx, "请先登录")
+	}
+	formParams, _ := ctx.FormParams()
+	err := logic.DefaultGoBook.Publish(context.EchoContext(ctx), meVal, formParams)
+	if err != nil {
+		return fail(ctx, err.Error())
+	}
+	return success(ctx, nil)
 }
 
 func (BookController) Delete(ctx echo.Context) error {

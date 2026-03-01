@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, h, onMounted } from 'vue'
 import { NCard, NDataTable, NSpin, NButton, NIcon, NPopconfirm, NSpace, NPagination, useMessage } from 'naive-ui'
-import { TrashOutline, OpenOutline } from '@vicons/ionicons5'
+import { TrashOutline, OpenOutline, CreateOutline, AddOutline } from '@vicons/ionicons5'
 import type { Book } from '@/types'
 import { getBooks, deleteBook } from '@/api/book'
 
@@ -21,11 +21,13 @@ const columns = [
   { title: '评论', key: 'cmtnum', width: 70 },
   { title: '创建时间', key: 'ctime', width: 170 },
   {
-    title: '操作', key: 'actions', width: 140,
+    title: '操作', key: 'actions', width: 180,
     render(row: Book) {
       return h(NSpace, { size: 4 }, () => [
         h(NButton, { size: 'small', quaternary: true, onClick: () => window.open(`/book/${row.id}`, '_blank') },
           { icon: () => h(NIcon, { component: OpenOutline, size: 14 }) }),
+        h(NButton, { size: 'small', quaternary: true, onClick: () => window.open(`/book/edit/${row.id}`, '_blank') },
+          { icon: () => h(NIcon, { component: CreateOutline, size: 14 }) }),
         h(NPopconfirm, { onPositiveClick: () => handleDelete(row.id) },
           {
             trigger: () => h(NButton, { size: 'small', quaternary: true, type: 'error' },
@@ -52,6 +54,12 @@ onMounted(load)
 
 <template>
   <NCard title="图书管理">
+    <template #header-extra>
+      <NButton type="primary" size="small" tag="a" href="/book/new" target="_blank">
+        <template #icon><NIcon :component="AddOutline" /></template>
+        添加图书
+      </NButton>
+    </template>
     <NSpin :show="loading">
       <NDataTable :columns="columns" :data="books" :bordered="false" :pagination="false" />
     </NSpin>

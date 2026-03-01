@@ -40,7 +40,7 @@ func (self CommentLogic) FindObjComments(ctx context.Context, objid, objtype int
 	objLog := GetLogger(ctx)
 
 	coll := db.GetCollection("comments")
-	filter := bson.M{"objid": objid, "objtype": objtype}
+	filter := bson.M{"objid": objid, "objtype": objtype, "content": bson.M{"$ne": ""}}
 
 	cursor, err := coll.Find(ctx, filter)
 	if err != nil {
@@ -190,7 +190,7 @@ func (CommentLogic) Total(objtypes ...int) int64 {
 // 如果 uid!=0，表示获取某人的评论；
 // 如果 objtype!=-1，表示获取某类型的评论；
 func (self CommentLogic) FindRecent(ctx context.Context, uid, objtype, limit int) []*model.Comment {
-	filter := bson.M{}
+	filter := bson.M{"content": bson.M{"$ne": ""}}
 	if uid != 0 {
 		filter["uid"] = uid
 	}
@@ -447,9 +447,11 @@ func (self CommentLogic) FindAll(ctx context.Context, paginator *Paginator, orde
 	objLog := GetLogger(ctx)
 
 	coll := db.GetCollection("comments")
-	filter := bson.M{}
+	filter := bson.M{"content": bson.M{"$ne": ""}}
 	if querystring != "" {
-		filter = buildFilter(querystring, args...)
+		for k, v := range buildFilter(querystring, args...) {
+			filter[k] = v
+		}
 	}
 
 	total, err := coll.CountDocuments(ctx, filter)
@@ -522,13 +524,15 @@ func (CommentLogic) EnrichWithUsers(ctx context.Context, comments []*model.Comme
 	return result
 }
 
-// Count 获取用户全部评论数
+// Count 获取评论数
 func (CommentLogic) Count(ctx context.Context, querystring string, args ...interface{}) int64 {
 	objLog := GetLogger(ctx)
 
-	filter := bson.M{}
+	filter := bson.M{"content": bson.M{"$ne": ""}}
 	if querystring != "" {
-		filter = buildFilter(querystring, args...)
+		for k, v := range buildFilter(querystring, args...) {
+			filter[k] = v
+		}
 	}
 
 	total, err := db.GetCollection("comments").CountDocuments(ctx, filter)

@@ -29,6 +29,8 @@ const routes: RouteRecordRaw[] = [
       { path: 'project/new', name: 'ProjectNew', component: () => import('@/pages/projects/ProjectEdit.vue'), meta: { requireAuth: true } },
       // Books
       { path: 'books', name: 'Books', component: () => import('@/pages/books/BookList.vue') },
+      { path: 'book/new', name: 'BookNew', component: () => import('@/pages/books/BookEdit.vue'), meta: { requireAuth: true } },
+      { path: 'book/edit/:id', name: 'BookEdit', component: () => import('@/pages/books/BookEdit.vue'), meta: { requireAuth: true } },
       { path: 'book/:id', name: 'BookDetail', component: () => import('@/pages/books/BookDetail.vue') },
       // Wiki
       { path: 'wiki', name: 'Wiki', component: () => import('@/pages/wiki/WikiList.vue') },

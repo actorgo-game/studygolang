@@ -13,6 +13,10 @@ export function createBook(data: Record<string, any>) {
   return postForm('/book/new', data)
 }
 
+export function modifyBook(data: Record<string, any>) {
+  return postForm('/book/new', data)
+}
+
 export function deleteBook(id: number) {
   return postForm('/book/delete', { id })
 }

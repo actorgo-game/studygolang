@@ -40,3 +40,11 @@ export function setTopicTop(data: { tid: number; top: number }) {
 export function deleteTopic(tid: number) {
   return postForm('/topics/delete', { tid })
 }
+
+export function modifyNode(data: Record<string, any>) {
+  return postForm('/node/modify', data)
+}
+
+export function deleteNode(nid: number) {
+  return postForm('/node/delete', { nid })
+}

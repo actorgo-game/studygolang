@@ -6,10 +6,12 @@ import { HeartOutline, ChatbubbleOutline, EyeOutline } from '@vicons/ionicons5'
 import type { Book } from '@/types'
 import { getBooks } from '@/api/book'
 import { useUserStore } from '@/stores/user'
+import { useAppStore } from '@/stores/app'
 
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const appStore = useAppStore()
 const books = ref<Book[]>([])
 const total = ref(0)
 const page = ref(1)
@@ -29,6 +31,7 @@ onMounted(load)
   <div>
     <NSpace justify="space-between" align="center" style="margin-bottom: 16px">
       <h2 style="margin: 0">图书推荐</h2>
+      <NButton type="primary" @click="userStore.isLoggedIn ? router.push('/book/new') : appStore.openLoginModal()">推荐图书</NButton>
     </NSpace>
     <NSpin :show="loading">
       <NEmpty v-if="!loading && !books.length" description="暂无图书" />

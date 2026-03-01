@@ -74,8 +74,11 @@ export interface TopicNode {
   nid: number
   parent: number
   name: string
+  ename: string
+  logo: string
   intro: string
   seq: number
+  show_index: boolean
   ctime: string
 }
 
@@ -150,6 +153,7 @@ export interface Project {
 
 export interface Book {
   id: number
+  uid: number
   name: string
   ename: string
   cover: string

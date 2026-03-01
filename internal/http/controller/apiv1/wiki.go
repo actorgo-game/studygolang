@@ -80,7 +80,11 @@ func (WikiController) Create(ctx echo.Context) error {
 	if meVal.Uid == 0 {
 		return fail(ctx, "请先登录")
 	}
-	err := logic.DefaultWiki.Create(context.EchoContext(ctx), meVal, ctx.Request().Form)
+	formParams, err := ctx.FormParams()
+	if err != nil {
+		return fail(ctx, "参数解析失败")
+	}
+	err = logic.DefaultWiki.Create(context.EchoContext(ctx), meVal, formParams)
 	if err != nil {
 		return fail(ctx, err.Error())
 	}
@@ -92,7 +96,11 @@ func (WikiController) Modify(ctx echo.Context) error {
 	if meVal.Uid == 0 {
 		return fail(ctx, "请先登录")
 	}
-	err := logic.DefaultWiki.Modify(context.EchoContext(ctx), meVal, ctx.Request().Form)
+	formParams, err := ctx.FormParams()
+	if err != nil {
+		return fail(ctx, "参数解析失败")
+	}
+	err = logic.DefaultWiki.Modify(context.EchoContext(ctx), meVal, formParams)
 	if err != nil {
 		return fail(ctx, err.Error())
 	}

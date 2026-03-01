@@ -59,7 +59,8 @@ func (ResourceController) Create(ctx echo.Context) error {
 	if meVal.Uid == 0 {
 		return fail(ctx, "请先登录")
 	}
-	err := logic.DefaultResource.Publish(context.EchoContext(ctx), meVal, ctx.Request().Form)
+	formParams, _ := ctx.FormParams()
+	err := logic.DefaultResource.Publish(context.EchoContext(ctx), meVal, formParams)
 	if err != nil {
 		return fail(ctx, err.Error())
 	}

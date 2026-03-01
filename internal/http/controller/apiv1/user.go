@@ -18,6 +18,8 @@ func (self UserController) RegisterRoute(g *echo.Group) {
 	g.GET("/user/:username/projects", self.Projects)
 	g.GET("/users", self.UserList)
 	g.GET("/users/active", self.ActiveUsers)
+	g.POST("/user/admin/status", self.AdminChangeStatus)
+	g.POST("/user/admin/delete", self.AdminDelete)
 	g.GET("/users/newest", self.NewestUsers)
 	g.POST("/user/modify", self.Modify)
 }
@@ -101,9 +103,37 @@ func (UserController) Modify(ctx echo.Context) error {
 	if meVal.Uid == 0 {
 		return fail(ctx, "请先登录")
 	}
-	errMsg, err := logic.DefaultUser.Update(context.EchoContext(ctx), meVal, ctx.Request().Form)
+	formParams, _ := ctx.FormParams()
+	errMsg, err := logic.DefaultUser.Update(context.EchoContext(ctx), meVal, formParams)
 	if err != nil {
 		return fail(ctx, errMsg)
+	}
+	return success(ctx, nil)
+}
+
+func (UserController) AdminChangeStatus(ctx echo.Context) error {
+	meVal := me(ctx)
+	if !meVal.IsRoot {
+		return fail(ctx, "无权操作")
+	}
+	uid := goutils.MustInt(ctx.FormValue("uid"))
+	status := goutils.MustInt(ctx.FormValue("status"))
+	err := logic.DefaultUser.UpdateUserStatus(context.EchoContext(ctx), uid, status)
+	if err != nil {
+		return fail(ctx, err.Error())
+	}
+	return success(ctx, nil)
+}
+
+func (UserController) AdminDelete(ctx echo.Context) error {
+	meVal := me(ctx)
+	if !meVal.IsRoot {
+		return fail(ctx, "无权操作")
+	}
+	uid := goutils.MustInt(ctx.FormValue("uid"))
+	err := logic.DefaultUser.DeleteUserContent(context.EchoContext(ctx), uid)
+	if err != nil {
+		return fail(ctx, err.Error())
 	}
 	return success(ctx, nil)
 }

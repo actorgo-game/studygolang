@@ -22,6 +22,8 @@ func (self TopicController) RegisterRoute(g *echo.Group) {
 	g.POST("/topics/modify", self.Modify)
 	g.POST("/topics/delete", self.Delete)
 	g.POST("/topic/set_top", self.SetTop)
+	g.POST("/node/modify", self.NodeModify)
+	g.POST("/node/delete", self.NodeDelete)
 }
 
 func (TopicController) TopicList(ctx echo.Context) error {
@@ -82,7 +84,8 @@ func (TopicController) Create(ctx echo.Context) error {
 	if meVal.Uid == 0 {
 		return fail(ctx, "请先登录")
 	}
-	tid, err := logic.DefaultTopic.Publish(context.EchoContext(ctx), meVal, ctx.Request().Form)
+	formParams, _ := ctx.FormParams()
+	tid, err := logic.DefaultTopic.Publish(context.EchoContext(ctx), meVal, formParams)
 	if err != nil {
 		return fail(ctx, err.Error())
 	}
@@ -94,7 +97,8 @@ func (TopicController) Modify(ctx echo.Context) error {
 	if meVal.Uid == 0 {
 		return fail(ctx, "请先登录")
 	}
-	errMsg, err := logic.DefaultTopic.Modify(context.EchoContext(ctx), meVal, ctx.Request().Form)
+	formParams, _ := ctx.FormParams()
+	errMsg, err := logic.DefaultTopic.Modify(context.EchoContext(ctx), meVal, formParams)
 	if err != nil {
 		return fail(ctx, errMsg)
 	}
@@ -117,6 +121,32 @@ func (TopicController) Delete(ctx echo.Context) error {
 func (TopicController) SetTop(ctx echo.Context) error {
 	tid := goutils.MustInt(ctx.FormValue("tid"))
 	err := logic.DefaultTopic.SetTop(context.EchoContext(ctx), me(ctx), tid)
+	if err != nil {
+		return fail(ctx, err.Error())
+	}
+	return success(ctx, nil)
+}
+
+func (TopicController) NodeModify(ctx echo.Context) error {
+	meVal := me(ctx)
+	if !meVal.IsRoot {
+		return fail(ctx, "无权操作")
+	}
+	formParams, _ := ctx.FormParams()
+	err := logic.DefaultNode.Modify(context.EchoContext(ctx), formParams)
+	if err != nil {
+		return fail(ctx, err.Error())
+	}
+	return success(ctx, nil)
+}
+
+func (TopicController) NodeDelete(ctx echo.Context) error {
+	meVal := me(ctx)
+	if !meVal.IsRoot {
+		return fail(ctx, "无权操作")
+	}
+	nid := goutils.MustInt(ctx.FormValue("nid"))
+	err := logic.DefaultNode.Delete(context.EchoContext(ctx), nid)
 	if err != nil {
 		return fail(ctx, err.Error())
 	}

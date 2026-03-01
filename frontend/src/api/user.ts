@@ -58,3 +58,11 @@ export function changeAvatar(file: File) {
 export function getUsers(params: { p?: number }) {
   return get<PaginatedData<User>>('/users', params)
 }
+
+export function adminChangeUserStatus(uid: number, status: number) {
+  return postForm('/user/admin/status', { uid, status })
+}
+
+export function adminDeleteUser(uid: number) {
+  return postForm('/user/admin/delete', { uid })
+}
