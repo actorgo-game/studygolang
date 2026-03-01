@@ -40,6 +40,7 @@ func (WikiLogic) Create(ctx context.Context, me *model.Me, form url.Values) erro
 	}
 
 	wiki.Uid = me.Uid
+	wiki.BeforeInsert()
 
 	newID, idErr := db.NextID("wiki")
 	if idErr != nil {

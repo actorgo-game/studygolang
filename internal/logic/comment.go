@@ -253,6 +253,7 @@ func (self CommentLogic) Publish(ctx context.Context, uid, objid int, form url.V
 		Objtype: objtype,
 		Uid:     uid,
 		Content: form.Get("content"),
+		Ctime:   model.OftenTime(time.Now()),
 	}
 
 	coll := db.GetCollection("comments")

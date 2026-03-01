@@ -38,6 +38,21 @@ func init() {
 
 	startTime, _ := time.ParseInLocation("2006-01-02 15:04:05", "2022-01-10 00:00:00", time.UTC)
 	snowFlake = snowflake.NewWith(startTime)
+
+	RegisterCommentObject(model.TypeTopic, TopicComment{})
+	RegisterCommentObject(model.TypeArticle, ArticleComment{})
+	RegisterCommentObject(model.TypeResource, ResourceComment{})
+	RegisterCommentObject(model.TypeProject, ProjectComment{})
+	RegisterCommentObject(model.TypeBook, BookComment{})
+	RegisterCommentObject(model.TypeInterview, InterviewComment{})
+
+	RegisterLikeObject(model.TypeTopic, TopicLike{})
+	RegisterLikeObject(model.TypeArticle, ArticleLike{})
+	RegisterLikeObject(model.TypeResource, ResourceLike{})
+	RegisterLikeObject(model.TypeProject, ProjectLike{})
+	RegisterLikeObject(model.TypeBook, BookLike{})
+	RegisterLikeObject(model.TypeComment, CommentLike{})
+	RegisterLikeObject(model.TypeInterview, InterviewLike{})
 }
 
 var (

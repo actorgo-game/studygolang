@@ -39,6 +39,13 @@ func (this *Resource) BeforeInsert() {
 	}
 
 	this.Lastreplytime = NewOftenTime()
+	now := OftenTime(time.Now())
+	if time.Time(this.Ctime).IsZero() {
+		this.Ctime = now
+	}
+	if time.Time(this.Mtime).IsZero() {
+		this.Mtime = now
+	}
 }
 
 // 资源扩展（计数）信息

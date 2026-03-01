@@ -75,6 +75,7 @@ func (ResourceLogic) Publish(ctx context.Context, me *model.Me, form url.Values)
 		}
 
 		resource.Uid = uid
+		resource.BeforeInsert()
 
 		newID, idErr := db.NextID("resource")
 		if idErr != nil {

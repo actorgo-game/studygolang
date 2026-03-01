@@ -11,6 +11,7 @@ import (
 	"html/template"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/studygolang/studygolang/db"
 	"github.com/studygolang/studygolang/internal/model"
@@ -39,6 +40,7 @@ func (MessageLogic) SendMessageTo(ctx context.Context, from, to int, content str
 		Tdel:    model.TdelNotDel,
 		Content: content,
 		Hasread: model.NotRead,
+		Ctime:   model.OftenTime(time.Now()),
 	}
 
 	id, err := db.NextID("message")
@@ -76,6 +78,7 @@ func (MessageLogic) SendSystemMsgTo(ctx context.Context, to, msgtype int, ext ma
 		To:      to,
 		Msgtype: msgtype,
 		Hasread: model.NotRead,
+		Ctime:   model.OftenTime(time.Now()),
 	}
 	message.SetExt(ext)
 
@@ -106,6 +109,7 @@ func (MessageLogic) SendSysMsgAtUids(ctx context.Context, uids string, ext map[s
 	message := &model.SystemMessage{
 		Msgtype: model.MsgtypeAtMe,
 		Hasread: model.NotRead,
+		Ctime:   model.OftenTime(time.Now()),
 	}
 	message.SetExt(ext)
 
@@ -149,6 +153,7 @@ func (MessageLogic) SendSysMsgAtUsernames(ctx context.Context, usernames string,
 	}
 	message := &model.SystemMessage{
 		Hasread: model.NotRead,
+		Ctime:   model.OftenTime(time.Now()),
 	}
 	if msgtype, ok := ext["msgtype"]; ok {
 		message.Msgtype = msgtype.(int)

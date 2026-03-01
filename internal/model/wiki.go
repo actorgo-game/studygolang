@@ -27,4 +27,7 @@ func (this *Wiki) BeforeInsert() {
 	if this.Tags == "" {
 		this.Tags = AutoTag(this.Title, this.Content, 4)
 	}
+	if time.Time(this.Ctime).IsZero() {
+		this.Ctime = OftenTime(time.Now())
+	}
 }
