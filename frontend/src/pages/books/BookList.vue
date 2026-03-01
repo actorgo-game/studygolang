@@ -36,7 +36,7 @@ onMounted(load)
               <div style="flex: 1; min-width: 0">
                 <router-link :to="`/book/${b.id}`" style="font-weight: 500; font-size: 15px; text-decoration: none; color: inherit">{{ b.name }}</router-link>
                 <div style="margin-top: 4px"><NText depth="3" style="font-size: 13px">{{ b.author }}{{ b.translator ? ` / ${b.translator} 译` : '' }}</NText></div>
-                <NText depth="3" style="font-size: 12px">{{ b.intro?.substring(0, 80) }}</NText>
+                <NText depth="3" style="font-size: 12px">{{ b.desc?.substring(0, 80) }}</NText>
               </div>
             </div>
           </NCard>
