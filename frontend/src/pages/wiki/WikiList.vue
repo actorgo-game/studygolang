@@ -26,7 +26,7 @@ onMounted(async () => {
     </NSpace>
     <NSpin :show="loading">
       <NEmpty v-if="!loading && !wikis.length" description="暂无Wiki" />
-      <div v-else class="list"><ContentCard v-for="w in wikis" :key="w.id" :title="w.title" :url="`/wiki/${w.uri}`" :author="w.user?.username" :author-url="w.user ? `/user/${w.user.username}` : undefined" :time="w.ctime" :viewnum="w.viewnum" :cmtnum="w.cmtnum" /></div>
+      <div v-else class="list"><ContentCard v-for="w in wikis" :key="w.id" :title="w.title" :url="`/wiki/${w.uri || w.id}`" :author="w.user?.username" :author-url="w.user ? `/user/${w.user.username}` : undefined" :time="w.ctime" :viewnum="w.viewnum" :cmtnum="w.cmtnum" /></div>
     </NSpin>
   </div>
 </template>

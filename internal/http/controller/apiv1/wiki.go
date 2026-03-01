@@ -35,6 +35,11 @@ func (WikiController) Detail(ctx echo.Context) error {
 	uri := ctx.Param("uri")
 	wiki := logic.DefaultWiki.FindOne(context.EchoContext(ctx), uri)
 	if wiki == nil || wiki.Id == 0 {
+		if id := goutils.MustInt(uri); id > 0 {
+			wiki = logic.DefaultWiki.FindById(context.EchoContext(ctx), id)
+		}
+	}
+	if wiki == nil || wiki.Id == 0 {
 		return fail(ctx, "Wiki不存在")
 	}
 	return success(ctx, map[string]interface{}{"wiki": wiki})

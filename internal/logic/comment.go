@@ -599,5 +599,26 @@ func (CommentLogic) Delete(ctx context.Context, cid, uid int, isRoot bool) error
 		return errors.New("无权删除")
 	}
 	_, err = db.GetCollection("comments").DeleteOne(ctx, bson.M{"_id": cid})
-	return err
+	if err != nil {
+		return err
+	}
+
+	go decrementCommentCount(comment.Objid, comment.Objtype)
+	return nil
+}
+
+func decrementCommentCount(objid, objtype int) {
+	ctx := context.Background()
+	switch objtype {
+	case model.TypeTopic:
+		db.GetCollection("topics_ex").UpdateOne(ctx, bson.M{"tid": objid}, bson.M{"$inc": bson.M{"reply": -1}})
+	case model.TypeArticle:
+		db.GetCollection("articles").UpdateOne(ctx, bson.M{"_id": objid}, bson.M{"$inc": bson.M{"cmtnum": -1}})
+	case model.TypeResource:
+		db.GetCollection("resource_ex").UpdateOne(ctx, bson.M{"_id": objid}, bson.M{"$inc": bson.M{"cmtnum": -1}})
+	case model.TypeProject:
+		db.GetCollection("open_project").UpdateOne(ctx, bson.M{"_id": objid}, bson.M{"$inc": bson.M{"cmtnum": -1}})
+	case model.TypeBook:
+		db.GetCollection("book").UpdateOne(ctx, bson.M{"_id": objid}, bson.M{"$inc": bson.M{"cmtnum": -1}})
+	}
 }

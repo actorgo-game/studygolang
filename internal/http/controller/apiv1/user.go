@@ -16,6 +16,7 @@ func (self UserController) RegisterRoute(g *echo.Group) {
 	g.GET("/user/:username/articles", self.Articles)
 	g.GET("/user/:username/resources", self.Resources)
 	g.GET("/user/:username/projects", self.Projects)
+	g.GET("/users", self.UserList)
 	g.GET("/users/active", self.ActiveUsers)
 	g.GET("/users/newest", self.NewestUsers)
 	g.POST("/user/modify", self.Modify)
@@ -38,7 +39,7 @@ func (UserController) Topics(ctx echo.Context) error {
 		return fail(ctx, "用户不存在")
 	}
 	paginator := logic.NewPaginatorWithPerPage(curPage, perPage)
-	topics := logic.DefaultTopic.FindAll(context.EchoContext(ctx), paginator, "topics", "uid=?", user.Uid)
+	topics := logic.DefaultTopic.FindAll(context.EchoContext(ctx), paginator, "", "uid=?", user.Uid)
 	return success(ctx, map[string]interface{}{"list": topics, "page": curPage})
 }
 
@@ -70,6 +71,17 @@ func (UserController) Projects(ctx echo.Context) error {
 	}
 	projects := logic.DefaultProject.FindRecent(context.EchoContext(ctx), username)
 	return success(ctx, map[string]interface{}{"list": projects})
+}
+
+func (UserController) UserList(ctx echo.Context) error {
+	curPage := goutils.MustInt(ctx.QueryParam("p"), 1)
+	users, total := logic.DefaultUser.FindUserByPage(context.EchoContext(ctx), nil, curPage, perPage)
+	return success(ctx, map[string]interface{}{
+		"list":     users,
+		"total":    total,
+		"page":     curPage,
+		"per_page": perPage,
+	})
 }
 
 func (UserController) ActiveUsers(ctx echo.Context) error {

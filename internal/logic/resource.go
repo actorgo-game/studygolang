@@ -609,13 +609,13 @@ func (self ResourceLike) String() string {
 
 func (ResourceLogic) Delete(ctx context.Context, id, uid int, isRoot bool) error {
 	resource := &model.Resource{}
-	err := db.GetCollection("resources").FindOne(ctx, bson.M{"_id": id}).Decode(resource)
+	err := db.GetCollection("resource").FindOne(ctx, bson.M{"_id": id}).Decode(resource)
 	if err != nil {
 		return errors.New("资源不存在")
 	}
 	if resource.Uid != uid && !isRoot {
 		return errors.New("无权删除")
 	}
-	_, err = db.GetCollection("resources").DeleteOne(ctx, bson.M{"_id": id})
+	_, err = db.GetCollection("resource").DeleteOne(ctx, bson.M{"_id": id})
 	return err
 }

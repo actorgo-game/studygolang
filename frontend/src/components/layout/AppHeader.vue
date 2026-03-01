@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { NMenu, NButton, NAvatar, NDropdown, NBadge, NInput, NSpace, NIcon } from 'naive-ui'
 import { SearchOutline, NotificationsOutline } from '@vicons/ionicons5'
@@ -24,15 +24,22 @@ const menuOptions = [
   { label: 'Wiki', key: '/wiki' },
 ]
 
-const userMenuOptions = [
-  { label: '我的主页', key: 'profile' },
-  { label: '个人设置', key: 'settings' },
-  { label: '我的收藏', key: 'favorites' },
-  { label: '我的余额', key: 'balance' },
-  { label: '消息中心', key: 'messages' },
-  { type: 'divider' as const, key: 'd1' },
-  { label: '退出登录', key: 'logout' },
-]
+const userMenuOptions = computed(() => {
+  const items: any[] = [
+    { label: '我的主页', key: 'profile' },
+    { label: '个人设置', key: 'settings' },
+    { label: '我的收藏', key: 'favorites' },
+    { label: '我的余额', key: 'balance' },
+    { label: '消息中心', key: 'messages' },
+  ]
+  if (userStore.isAdmin) {
+    items.push({ type: 'divider', key: 'd0' })
+    items.push({ label: '管理后台', key: 'admin' })
+  }
+  items.push({ type: 'divider', key: 'd1' })
+  items.push({ label: '退出登录', key: 'logout' })
+  return items
+})
 
 function onMenuSelect(key: string) {
   router.push(key)
@@ -61,6 +68,9 @@ async function onUserMenuSelect(key: string) {
       break
     case 'messages':
       router.push('/message/system')
+      break
+    case 'admin':
+      router.push('/admin')
       break
     case 'logout':
       await handleLogout()
